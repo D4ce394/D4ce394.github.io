@@ -1,0 +1,362 @@
+---
+// Layout from design/open-design-v3-playful.html (Open Design). Rendered once per language.
+import fs from 'node:fs';
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+import { profileId } from '../data/profile.id';
+import { ui, type Lang } from '../data/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const p = lang === 'id' ? profileId : profile;
+const t = ui[lang];
+const base = import.meta.env.BASE_URL;
+const mask = `${base}d4ce-mask.png`;
+const other = lang === 'id' ? base : `${base}id/`;
+const ext = { target: '_blank', rel: 'noopener noreferrer' };
+const nav = (['about', 'gallery', 'work', 'experience', 'research', 'certifications', 'contact'] as const).map((k) => [`#${k}`, t.nav[k]]);
+const filters = (['all', 'backend', 'fullstack', 'ai'] as const).map((k) => [k, t.filters[k]]);
+const marquee = ['Python', 'Django REST', 'FastAPI', 'PostgreSQL', 'Docker', 'React', 'PyTorch', 'Redis'];
+const [first, second, last] = p.name;
+
+// A project image dropped in public/projects/<key>.(webp|jpg|jpeg|png) replaces the drawn illustration.
+const imageFor = (key: string) =>
+  ['webp', 'jpg', 'jpeg', 'png'].map((e) => `projects/${key}.${e}`).find((f) => fs.existsSync(`public/${f}`));
+
+// dialog data, read by main.js
+const cases = Object.fromEntries(p.projects.map((x) => [x.cover, {
+  title: x.name, cat: x.kind, date: x.date, desc: x.desc,
+  part: x.part ?? x.status ?? '', tools: x.chips.join(', '), note: x.note ?? '', repo: x.repo ?? '',
+}]));
+
+// Activity gallery: photo n.jpg in src/assets/gallery/ goes with caption n in ui.ts.
+const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/gallery/*.jpg', { eager: true });
+const gallery = await Promise.all(t.gallery.captions.map(async (caption, i) => {
+  const src = photos[`../assets/gallery/${i + 1}.jpg`].default;
+  const thumb = await getImage({ src, width: 720, format: 'webp' });
+  const full = await getImage({ src, width: Math.min(1600, src.width), format: 'webp' });
+  return { thumb: thumb.src, full: full.src, w: thumb.attributes.width, h: thumb.attributes.height, caption };
+}));
+const steps = [
+  ...p.experience.map((m) => ({ when: m.date, title: m.role, org: m.org, text: m.desc })),
+  { when: p.education.period, title: p.education.degree, org: p.education.school, text: t.experience.eduNote },
+];
+---
+<Base lang={lang} alt={other}>
+<a class="skip" href="#work">{t.skip}</a>
+<div class="progress" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span></span></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3M4 17h3c2 0 3-1.5 4-3.3M13.5 9.3C14.5 8 15.4 7 17 7h3M17 4l3 3-3 3M17 14l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <nav class="wrap nav" aria-label="Main">
+    <a class="logo" href="#top" aria-label={`${p.fullName}, ${t.toTop.toLowerCase()}`}><img src={mask} width="556" height="604" alt="">{p.nick}<i>.</i></a>
+    <div class="nav-links" id="nav-links">{nav.map(([href, label]) => <a href={href}>{label}</a>)}</div>
+    <div class="nav-end">
+      <a class="lang" href={other} hreflang={lang === 'id' ? 'en' : 'id'} aria-label={t.langLabel}>{t.langLink}</a>
+      <a class="nav-cta" href="#contact">{t.cta} <svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label={t.menuOpen}>
+        <svg class="od-icon i-open" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="od-icon i-close" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="hero-name">
+    <div class="hero-deco" aria-hidden="true">
+      <svg class="burst" viewBox="0 0 200 200" width="260" height="260">
+        <path fill="#FFD166" d="M100 8l14 42 38-24-12 44 46 4-38 26 32 34-46-6 4 46-38-28-38 28 4-46-46 6 32-34-38-26 46-4-12-44 38 24z"/>
+      </svg>
+    </div>
+
+    <div class="wrap">
+      <p class="status"><span class="dot" aria-hidden="true"></span>{t.status}</p>
+      <h1 class="hero-name" id="hero-name" data-split>
+        <span class="line">{first} {second}</span>
+        <span class="line line--serif">{last}.</span>
+      </h1>
+
+      <div class="hero-lede">
+        <p class="role-line">
+          <span class="sr-only">{`${t.rolePre} ${p.roles.join(', ')}.`}</span>
+          <span aria-hidden="true">{t.rolePre}{' '}<span class="roles">{p.roles.map((r, i) => <span class:list={['role-word', { 'is-on': i === 0 }]}>{r}</span>)}</span>
+          </span><br aria-hidden="true">
+          <span aria-hidden="true">{t.roleTail}</span>
+        </p>
+        <div class="od-stack" style="--od-gap: 24px">
+          <p class="hero-text">{p.heroText}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#work">{t.seeWork} <svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost" href="#contact">{t.contactMe}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a class="badge" href="#work" aria-label={t.badgeLabel}>
+      <svg class="ring" viewBox="0 0 132 132" aria-hidden="true">
+        <defs><path id="circ" d="M66 66m-50 0a50 50 0 1 1 100 0a50 50 0 1 1-100 0"/></defs>
+        <text font-family="DM Sans, sans-serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#1C1210"><textPath href="#circ">{t.badge}</textPath></text>
+      </svg>
+      <span class="core"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow-down"/></svg></span>
+    </a>
+  </section>
+
+  <div class="marquee" aria-label={`Stack: ${marquee.join(', ')}`}>
+    <div class="marquee-track" aria-hidden="true">
+      <ul>{marquee.map((s) => <li>{s} <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>)}</ul>
+    </div>
+  </div>
+
+  <!-- 01 About -->
+  <section class="section" id="about" aria-labelledby="about-title">
+    <div class="wrap about-grid">
+      <figure class="photo reveal" style="margin:0">
+        <span class="tape" aria-hidden="true"></span>
+        <div class="photo-card">
+          <img class="me" src={`${base}me.jpg`} width="354" height="472" alt={t.about.photo(p.fullName)}>
+          <span class="label">{p.nick} · Bandung</span>
+        </div>
+      </figure>
+
+      <div class="about-copy">
+        <p class="eyebrow reveal"><b>01</b> {t.about.eyebrow}</p>
+        <h2 class="sr-only" id="about-title">{t.about.srTitle}</h2>
+        <p class="big reveal" style="--i:1" set:html={t.about.big(p.nick)} />
+        {p.about.body.map((s, i) => <p class="body reveal" style={`--i:${i + 2}`}>{s}</p>)}
+        <dl class="facts">
+          {t.about.facts.map(([k, v], i) => <div class="od-field reveal" style={`--i:${i + 4}`}><dt>{k}</dt><dd>{v}</dd></div>)}
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Gallery -->
+  <section class="section process" id="gallery" aria-labelledby="gallery-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>02</b> {t.gallery.eyebrow}</p>
+        <h2 class="h2" id="gallery-title" set:html={t.gallery.title} />
+        <p class="play-hint">{t.gallery.hint}</p>
+      </div>
+      <ul class="gallery">
+        {gallery.map((g, i) => (
+          <li class="shot reveal" style={`--i:${i % 3}; --r:${[-2.5, 1.5, -1, 2, -1.8, 1][i % 6]}deg`}>
+            <button class="shot-btn" type="button" data-full={g.full} data-caption={g.caption} aria-label={`${t.gallery.open}: ${g.caption}`}>
+              <span class="tape" aria-hidden="true"></span>
+              <img src={g.thumb} width={g.w} height={g.h} alt="" loading="lazy" decoding="async">
+              <span class="shot-cap">{g.caption}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 03 Work -->
+  <section class="section" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="works-head">
+        <div class="reveal">
+          <p class="eyebrow"><b>03</b> {t.work.eyebrow}</p>
+          <h2 class="h2" id="work-title" set:html={t.work.title} />
+        </div>
+        <div class="filters reveal" role="group" aria-label={t.work.filterLabel}>
+          {filters.map(([key, label], i) => <button class="filter" type="button" data-filter={key} aria-pressed={String(i === 0)}>{label}</button>)}
+        </div>
+      </div>
+      <p class="works-count" id="works-count" aria-live="polite">{t.work.count(p.projects.length)}</p>
+
+      <div class="works" id="works">
+        {p.projects.map((x) => {
+          const img = imageFor(x.cover);
+          return (
+            <article class="work reveal" data-cat={x.cats.join(' ')}>
+              {img ? <div class="art art-photo" aria-hidden="true"><span class="tag">{x.date}</span><img src={`${base}${img}`} alt="" loading="lazy"></div>
+              : x.cover === 'satelit' ? <div class="art art-4" aria-hidden="true"><span class="tag">{x.date}</span><span class="grid"></span></div>
+              : x.cover === 'mammoguard' ? <div class="art art-mammo" aria-hidden="true"><span class="tag">{x.date}</span><span class="scan"></span><span class="heat"></span><span class="box"></span><span class="dot"></span></div>
+              : x.cover === 'iot' ? <div class="art art-iot" aria-hidden="true"><span class="tag">{x.date}</span><span class="cam"></span>
+                  <span class="hen" style="left:16%"></span><span class="hen" style="left:43%; bottom:30%"></span><span class="hen" style="left:70%"></span>
+                  <span class="det" style="left:13%"></span><span class="det" style="left:40%; bottom:24%"></span><span class="det" style="left:67%"></span></div>
+              : x.cover === 'feast' ? <div class="art art-1" aria-hidden="true"><span class="tag">{x.date}</span><span class="phone"></span><span class="cup"></span><span class="bean"></span></div>
+              : <div class="art art-sajiin" aria-hidden="true"><span class="tag">{x.date}</span><span class="receipt"></span><span class="check"></span><span class="coin"></span></div>}
+              <div class="work-meta od-row">
+                <div class="od-fill od-field">
+                  <h3 class="work-title">{x.name}</h3>
+                  <p class="work-cat">{x.kind}{x.featured && ` · ${t.work.featured}`}</p>
+                </div>
+                <button class="work-open od-fixed" type="button" data-id={x.cover} aria-label={t.work.details(x.name)}><svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Experience -->
+  <section class="section process" id="experience" aria-labelledby="experience-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>04</b> {t.experience.eyebrow}</p>
+        <h2 class="h2" id="experience-title" set:html={t.experience.title} />
+      </div>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li class="step reveal" style={`--i:${i}`}>
+            <span class="num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <p class="when">{s.when}</p>
+            <h3>{s.title}</h3>
+            <p class="org">{s.org}</p>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 05 Research -->
+  <section class="section" id="research" aria-labelledby="research-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>05</b> {t.research.eyebrow}</p>
+        <h2 class="h2" id="research-title" set:html={t.research.title} />
+      </div>
+      <div class="research-grid">
+        <div class="work reveal"><div class="art art-xai" aria-hidden="true"><span class="mini"></span><span class="mini"></span><span class="mini"></span></div></div>
+        <div class="research-copy reveal" style="--i:1">
+          <p><span class="pill hot">{p.research.status}</span> <span class="pill">{p.research.kind}</span></p>
+          <h3 class="research-title" lang="en">{p.research.title}</h3>
+          <p>{p.research.desc}</p>
+          <p>{p.research.detail}</p>
+          <ul class="chips">{p.research.chips.map((c) => <li class="chip">{c}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Certifications -->
+  <section class="section process" id="certifications" aria-labelledby="certifications-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>06</b> {t.certifications.eyebrow}</p>
+        <h2 class="h2" id="certifications-title" set:html={t.certifications.title} />
+      </div>
+      <ul class="certs reveal">
+        {p.certs.map((c) => <li><b>{c.name}</b><span>{c.org} · {c.date}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 07 Toolbox -->
+  <section class="section" id="toolbox" aria-labelledby="toolbox-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>07</b> {t.toolbox.eyebrow}</p>
+        <h2 class="h2" id="toolbox-title" set:html={t.toolbox.title} />
+      </div>
+      <div class="toolbox">
+        {p.skills.map((g, i) => (
+          <div class="reveal" style={`--i:${i % 3}`}>
+            <h3>{g.title}</h3>
+            <ul class="chips">{g.items.map((s) => <li class="chip">{s}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Off duty -->
+  <section class="section" id="fun" aria-labelledby="fun-title">
+    <div class="wrap">
+      <div class="play-head">
+        <div class="reveal">
+          <p class="eyebrow"><b>08</b> {t.fun.eyebrow}</p>
+          <h2 class="h2" id="fun-title" set:html={t.fun.title} />
+          <p class="play-hint">{t.fun.hint}</p>
+        </div>
+        <button class="btn btn-ghost shuffle reveal" type="button" id="shuffle"><svg class="od-icon" aria-hidden="true"><use href="#i-shuffle"/></svg>{t.fun.shuffle}</button>
+      </div>
+      <div class="playfield" id="playfield" role="group" aria-label={t.fun.board}>
+        {p.fun.map((s, i) => {
+          const shape = ['s-pill', 's-circle', 's-square', 's-blob', 's-ticket', 's-circle', 's-pill'][i % 7];
+          const tint = i === 5 ? 'background: var(--butter)' : i === 6 ? 'background: var(--salmon)' : '';
+          return <button class={`sticker ${shape}`} type="button" style={tint} set:html={s} />;
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 Contact -->
+  <section class="section contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="eyebrow reveal"><b>09</b> {t.contact.eyebrow}</p>
+      <h2 class="contact-title reveal" id="contact-title" style="--i:1" set:html={t.contact.title} />
+      <div class="contact-actions reveal" style="--i:2">
+        <button class="btn btn-primary" type="button" id="copy-email" data-email={p.email}>
+          <svg class="od-icon" aria-hidden="true"><use href="#i-copy"/></svg>{t.contact.copy} <span class="email-text">{p.email}</span>
+        </button>
+        <a class="btn btn-ghost" href={`mailto:${p.email}`}><svg class="od-icon" aria-hidden="true"><use href="#i-mail"/></svg>{t.contact.send}</a>
+      </div>
+      <ul class="socials reveal" style="--i:3">
+        <li><a href={p.github.url} {...ext}>GitHub <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+        <li><a href={p.linkedin.url} {...ext}>LinkedIn <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p>© {new Date().getFullYear()} {p.fullName}. {t.footer}</p>
+    <button class="to-top" type="button" id="to-top"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>{t.toTop}</button>
+  </div>
+</footer>
+
+<dialog class="case" id="case" aria-labelledby="case-title">
+  <div class="art case-art" id="case-art" aria-hidden="true"></div>
+  <div class="case-body">
+    <div class="case-top od-row-top">
+      <div class="od-fill od-field">
+        <p class="case-cat" id="case-cat"></p>
+        <h2 class="case-title" id="case-title"></h2>
+      </div>
+      <button class="case-close od-fixed" type="button" id="case-close" aria-label={t.dialog.close}><svg class="od-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <p class="case-desc" id="case-desc"></p>
+    <dl class="case-meta">
+      <div class="od-field"><dt>{t.dialog.part}</dt><dd id="case-part"></dd></div>
+      <div class="od-field"><dt>{t.dialog.stack}</dt><dd id="case-tools"></dd></div>
+      <div class="od-field"><dt>{t.dialog.when}</dt><dd id="case-date"></dd></div>
+    </dl>
+    <p class="case-note" id="case-note" hidden></p>
+    <a class="btn btn-primary case-repo" id="case-repo" href="#" target="_blank" rel="noopener noreferrer" hidden>{t.dialog.repo} <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a>
+    <p class="case-private" id="case-private" hidden>{t.dialog.private}</p>
+  </div>
+</dialog>
+
+<dialog class="lightbox" id="lightbox" aria-label={t.gallery.eyebrow}>
+  <button class="case-close lb-close" type="button" id="lb-close" aria-label={t.gallery.close}><svg class="od-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+  <img id="lb-img" alt="">
+  <p class="lb-cap" id="lb-cap"></p>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script type="application/json" id="cases" set:html={JSON.stringify(cases)} />
+</Base>

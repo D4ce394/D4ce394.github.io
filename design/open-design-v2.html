@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Dandi Septian Yusniawan · Backend developer</title>
+  <meta name="description" content="Dandi Septian Yusniawan, backend developer from Bandung working with Python, Django REST Framework, FastAPI and Docker. Final-year Informatics student at Telkom University.">
+  <script>
+    // Decide motion before first paint: the curtain intro plays once per session, never with reduced motion.
+    (function () {
+      var root = document.documentElement;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      root.classList.add('anim');
+      var seen = false;
+      try { seen = sessionStorage.getItem('d4ce-intro') === '1'; sessionStorage.setItem('d4ce-intro', '1'); } catch (e) { /* storage blocked: still play once */ }
+      if (!seen) root.classList.add('intro');
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&display=swap" rel="stylesheet">
+  <style>
+    /* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio, geometry.
+       Put this @layer first; product CSS outside the layer wins ordinary layout rules.
+       Native hidden and closed-dialog states take precedence over component display rules. */
+    @layer od-layout {
+      [hidden]:not([hidden="until-found" i]) { display: none !important; }
+      dialog:not([open]) { display: none !important; }
+
+      :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+
+      .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+      .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+      .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+      .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+      .od-fill    { flex: 1 1 0; min-width: 0; }
+      .od-fixed   { flex: none; }
+      .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+
+      .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+      :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+      .od-tile { display: grid; grid-template-rows: auto 1fr; }
+      :where(.od-tile) > :where(*) { display: block; }
+
+      .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+      .od-media-cover { object-fit: cover; }
+
+      .od-icon { display: inline-block; inline-size: var(--od-icon-size, 1em); block-size: var(--od-icon-size, 1em); flex: none; }
+
+      .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+      .od-clamp-2 { -webkit-line-clamp: 2; }
+      .od-clamp-3 { -webkit-line-clamp: 3; }
+      .od-lines-2 { min-height: calc(2 * 1.4em); }
+      .od-nowrap  { white-space: nowrap; }
+      .od-keep    { word-break: keep-all; overflow-wrap: anywhere; }
+
+      .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+      .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+
+      .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+                 padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+      .od-rail::-webkit-scrollbar { display: none; }
+      :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+      :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+
+      .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+      .od-touch  { min-width: 44px; min-height: 44px; }
+    }
+    :root [hidden]:where(:not([hidden="until-found" i])) { display: none; }
+    /* /OD-LAYOUT-PRIMITIVES v1 */
+
+    :root {
+      /* grounds */
+      --bg: #FBF8F2;
+      --bg-alt: #F5EFE4;
+      --card: #FFFDF8;
+      --chip-bg: #EFE6D6;
+
+      /* ink + warm browns / creams */
+      --ink: #111111;
+      --brown: #5C5048;          /* secondary text */
+      --brown-soft: #7A6B60;     /* faintest text: only on warm white or cards, never on cream */
+      --cream-2: #EFE6D6;
+      --sand: #D9CBB4;
+      --sand-deep: #BBA88B;
+      --line: #E6DDCD;
+      --card-line: #E6DDCD;
+
+      /* the one accent */
+      --red: #E3201B;            /* shapes, highlights, buttons */
+      --red-deep: #C81B17;       /* small text links, hover */
+      --red-tint: #FCEBEA;
+      --red-underline: rgba(200, 27, 23, 0.35);
+
+      /* ink section */
+      --on-ink: #FBF8F2;
+      --on-ink-soft: #CFC3B4;
+      --on-ink-line: rgba(251, 248, 242, 0.14);
+
+      /* type */
+      --font-display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+      --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --fs-name: clamp(3rem, 1.5rem + 5.4vw, 6rem);
+      --fs-h2: clamp(1.875rem, 1.4rem + 1.8vw, 2.75rem);
+      --fs-h3: 1.1875rem;
+      --fs-lead: 1.25rem;
+      --fs-body: 1.0625rem;
+      --fs-small: 0.9375rem;
+      --fs-chip: 0.875rem;
+      --lh-body: 1.7;
+
+      /* spacing */
+      --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+      --s-6: 32px; --s-7: 40px; --s-8: 48px; --s-9: 64px; --s-10: 96px;
+      --gutter: 20px;
+      --max: 1200px;
+      --radius-card: 16px;
+      --radius-inner: 12px;
+
+      /* motion */
+      --t-hover: 220ms;
+      --t-lift: 300ms;
+      --t-reveal: 400ms;
+      --ease-out: cubic-bezier(0.22, 0.8, 0.24, 1);
+      --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+      --hero-delay: 80ms;
+      --shadow-lift: 0 18px 32px -18px rgba(92, 80, 72, 0.24);
+    }
+    :root.intro { --hero-delay: 640ms; }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      line-height: var(--lh-body);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--red-tint); color: var(--ink); }
+    h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+    ul, ol { padding: 0; list-style: none; }
+    h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; }
+    p { text-wrap: pretty; }
+    img { max-width: 100%; }
+
+    a {
+      color: var(--red-deep);
+      text-decoration: underline;
+      text-decoration-color: var(--red-underline);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      transition: color var(--t-hover) ease-out, text-decoration-color var(--t-hover) ease-out;
+    }
+    :focus-visible { outline: 2px solid var(--red-deep); outline-offset: 3px; border-radius: 6px; }
+
+    .skip-link {
+      position: absolute; top: var(--s-2); left: var(--s-2); z-index: 200;
+      padding: var(--s-2) var(--s-4);
+      background: var(--ink); color: var(--on-ink);
+      border-radius: 8px; text-decoration: none;
+      transform: translateY(-200%);
+    }
+    .skip-link:focus-visible { transform: none; color: var(--on-ink); }
+
+    .wrap { max-width: calc(var(--max) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+
+    /* svg palette classes: every illustration stays on the logo palette */
+    .f-ink { fill: var(--ink); } .f-brown { fill: var(--brown); } .f-card { fill: var(--card); } .f-white { fill: #FFFFFF; }
+    .f-cream-2 { fill: var(--cream-2); } .f-sand { fill: var(--sand); } .f-sand-deep { fill: var(--sand-deep); }
+    .f-alt { fill: var(--bg-alt); } .f-chip { fill: var(--chip-bg); } .f-red { fill: var(--red); }
+    .st-ink { stroke: var(--ink); } .st-brown { stroke: var(--brown); } .st-sand { stroke: var(--sand); }
+    .st-sand-deep { stroke: var(--sand-deep); } .st-red { stroke: var(--red); } .st-white { stroke: #FFFFFF; }
+
+    /* ---------- opening curtain ---------- */
+    .curtain { display: none; }
+    .intro .curtain { position: fixed; inset: 0; z-index: 100; display: block; pointer-events: none; }
+    .curtain-panel {
+      position: absolute; inset: 0 0 -32px 0;   /* rounded edge starts below the fold */
+      display: grid; place-items: center;
+      padding-bottom: 32px;
+      border-radius: 0 0 32px 32px;
+      animation: curtain-up 560ms var(--ease-curtain) both;
+      animation-delay: calc(380ms + var(--i) * 90ms);
+    }
+    .curtain-ink { background: var(--ink); }
+    .curtain-red { background: var(--red); }
+    .curtain-white { background: var(--bg); }
+    .curtain-mark {
+      display: block; width: clamp(112px, 16vw, 176px); height: auto;
+      animation: mark-in 320ms var(--ease-out) both;
+    }
+    @keyframes curtain-up { to { transform: translateY(-104%); } }
+    @keyframes mark-in { from { opacity: 0; transform: scale(0.82); } to { opacity: 1; transform: none; } }
+
+    /* ---------- hero ---------- */
+    .hero-screen { min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: auto 1fr; }
+    .topbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      column-gap: var(--s-5);
+      padding-block: var(--s-3);
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: var(--s-3);
+      min-height: 44px;
+      color: var(--ink); font-family: var(--font-display); font-weight: 700; font-size: 1.0625rem;
+      text-decoration: none;
+    }
+    .brand img { display: block; width: 30px; height: auto; flex: none; }
+    .nav ul { display: flex; flex-wrap: wrap; column-gap: var(--s-5); }
+    .nav a {
+      position: relative;
+      display: inline-flex; align-items: center; min-height: 44px;
+      color: var(--ink); font-size: var(--fs-small); font-weight: 500; text-decoration: none;
+    }
+    .nav a::after {
+      content: ""; position: absolute; left: 0; right: 0; bottom: 10px; height: 2px;
+      border-radius: 2px; background: var(--red);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform var(--t-hover) ease-out;
+    }
+
+    .hero {
+      display: grid; grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-7); align-items: center; align-self: center;
+      padding-block: var(--s-6) var(--s-9);
+    }
+    .hero-name { font-size: var(--fs-name); font-weight: 800; line-height: 0.96; letter-spacing: -0.035em; }
+    .hero-word { display: block; overflow: hidden; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+    .hero-word > span { display: inline-block; }
+    .hero-role { margin-top: var(--s-5); font-size: var(--fs-lead); font-weight: 500; line-height: 1.5; }
+    .hero-role strong { font-weight: 700; }
+    .hero-sentence { margin-top: var(--s-3); max-width: 44ch; color: var(--brown); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-6); }
+    .hero-links { display: flex; flex-wrap: wrap; column-gap: var(--s-5); margin-top: var(--s-3); }
+    .hero-links a {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+      color: var(--brown); font-size: var(--fs-small); font-weight: 500; text-decoration: none;
+    }
+    .hero-links .od-icon { --od-icon-size: 0.875rem; transition: transform var(--t-hover) ease-out; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+      min-height: 48px; padding: 0 22px;
+      border-radius: 12px; border: 1.5px solid transparent;
+      font: inherit; font-weight: 600; font-size: 1rem; text-decoration: none;
+      transition: background-color var(--t-hover) ease-out, border-color var(--t-hover) ease-out, color var(--t-hover) ease-out, transform var(--t-hover) ease-out;
+    }
+    .btn .od-icon { --od-icon-size: 1rem; transition: transform var(--t-hover) ease-out; }
+    .btn-primary { background: var(--red); color: #FFFFFF; }
+    .btn-primary:focus-visible { color: #FFFFFF; }
+    .btn-secondary { background: transparent; color: var(--ink); border-color: var(--ink); }
+
+    /* hero visual: logo mask over a few cursor-shy dots */
+    .hero-visual {
+      position: relative;
+      display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+      place-items: center;
+      width: 100%; aspect-ratio: 4 / 3;
+      --px: 0; --py: 0;
+    }
+    .hero-visual > :not(canvas) { grid-area: 1 / 1; }
+    .dot-field { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .hv-disc {
+      width: 66%; aspect-ratio: 1; border-radius: 50%; background: var(--bg-alt);
+      transform: translate(calc(var(--px) * -14px), calc(var(--py) * -14px));
+      transition: transform 700ms var(--ease-out);
+    }
+    .hv-ring {
+      width: 74%; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--sand);
+      transform: translate(calc(6% + var(--px) * 26px), calc(-4% + var(--py) * 26px));
+      transition: transform 700ms var(--ease-out);
+    }
+    .hv-red {
+      align-self: start; justify-self: end;
+      width: 5%; min-width: 14px; aspect-ratio: 1; border-radius: 50%; background: var(--red);
+      margin: 12% 18% 0 0;
+      transform: translate(calc(var(--px) * 36px), calc(var(--py) * 36px));
+      transition: transform 700ms var(--ease-out);
+    }
+    .hv-ink {
+      align-self: end; justify-self: start;
+      width: 2.4%; min-width: 8px; aspect-ratio: 1; border-radius: 50%; background: var(--ink);
+      margin: 0 0 16% 20%;
+      transform: translate(calc(var(--px) * 44px), calc(var(--py) * 44px));
+      transition: transform 700ms var(--ease-out);
+    }
+    .hv-shadow {
+      align-self: end;
+      width: 30%; aspect-ratio: 6 / 1; border-radius: 50%; background: var(--cream-2);
+      margin-bottom: 8%;
+    }
+    .mask-float { width: 46%; }
+    .mask-img {
+      display: block; width: 100%; height: auto;
+      transform: perspective(900px) rotateY(calc(var(--px) * 18deg)) rotateX(calc(var(--py) * -12deg)) translate(calc(var(--px) * 16px), calc(var(--py) * 12px));
+      transition: transform 600ms var(--ease-out);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .anim .mask-float { animation: float 6s ease-in-out infinite; }
+      .anim .hv-shadow { animation: float-shadow 6s ease-in-out infinite; }
+    }
+    @keyframes float { 0%, 100% { transform: translateY(-8px) rotate(-1deg); } 50% { transform: translateY(6px) rotate(1deg); } }
+    @keyframes float-shadow { 0%, 100% { transform: scaleX(0.86); opacity: 0.7; } 50% { transform: scaleX(1); opacity: 1; } }
+
+    /* hero entrance */
+    .anim .hero-word > span {
+      animation: word-up 560ms var(--ease-out) both;
+      animation-delay: calc(var(--hero-delay) + var(--i) * 80ms);
+    }
+    .anim .hero-seq {
+      animation: rise 420ms ease-out both;
+      animation-delay: calc(var(--hero-delay) + var(--d, 0ms));
+    }
+    @keyframes word-up { from { transform: translateY(110%); } to { transform: none; } }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- bands ---------- */
+    .band { position: relative; padding-block: var(--s-9); }
+    .band-line { border-top: 1px solid var(--line); }
+    .band-alt { background: var(--bg-alt); }
+    .band-ink { background: var(--ink); color: var(--on-ink); }
+    .band h2 {
+      font-size: var(--fs-h2);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      margin-bottom: var(--s-7);
+    }
+    .lead-in { font-weight: 700; color: var(--ink); }
+    .org { color: var(--brown); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-line);
+      border-radius: var(--radius-card);
+      transition: transform var(--t-lift) var(--ease-out), box-shadow var(--t-lift) var(--ease-out);
+    }
+    .pill {
+      display: inline-flex; align-items: center; align-self: flex-start;
+      padding: 2px 12px; border-radius: 999px;
+      font-size: var(--fs-chip); font-weight: 600; line-height: 1.7;
+      white-space: nowrap;
+      background: var(--chip-bg); color: var(--brown);
+    }
+    .pill-red { background: var(--red-tint); color: var(--red-deep); }
+    .pill-ink { background: var(--ink); color: var(--on-ink); }
+    .chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+    .chip {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px; border-radius: 999px;
+      background: var(--chip-bg); border: 1px solid var(--line); color: var(--brown);
+      font-size: var(--fs-chip); font-weight: 500; line-height: 1.5;
+      white-space: nowrap;
+    }
+    .card .chip { border-color: transparent; }
+
+    /* about */
+    .about-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-7); align-items: start; }
+    .squiggle-word { position: relative; display: inline-block; white-space: nowrap; }
+    .squiggle {
+      position: absolute; left: -2%; bottom: -0.2em;
+      width: 104%; height: 0.32em;
+      overflow: visible; pointer-events: none;
+    }
+    .squiggle path {
+      fill: none; stroke: var(--red); stroke-width: 3; stroke-linecap: round;
+      stroke-dasharray: 1; stroke-dashoffset: 0;
+      transition: stroke-dashoffset 800ms var(--ease-out) 250ms;
+    }
+    .about-text p { max-width: 62ch; }
+    .about-text p + p { margin-top: var(--s-4); }
+    .about-text .offclock {
+      display: flex; align-items: baseline; gap: var(--s-3);
+      margin-top: var(--s-6);
+      color: var(--brown); font-size: var(--fs-small);
+    }
+    .offclock::before {
+      content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%;
+      border: 2px solid var(--ink); transform: translateY(-1px);
+    }
+    .facts { padding: var(--s-5); }
+    .facts-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-4); }
+    .facts-head h3 { font-size: 1rem; font-weight: 700; }
+    .facts-deco { display: flex; align-items: center; gap: 6px; flex: none; }
+    .facts-deco span { display: block; width: 12px; height: 12px; }
+    .facts-deco span:nth-child(1) { border-radius: 50%; background: var(--ink); }
+    .facts-deco span:nth-child(2) { border-radius: 3px; background: var(--red); }
+    .facts-deco span:nth-child(3) { border-radius: 12px 12px 0 0; height: 6px; background: var(--sand-deep); }
+    .facts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4) var(--s-5); }
+    .fact { display: grid; gap: 2px; }
+    .fact dt { color: var(--brown-soft); font-size: var(--fs-chip); }
+    .fact dd { font-weight: 600; line-height: 1.45; }
+
+    /* experience */
+    .exp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
+    .exp { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-5); }
+    .exp h3 { margin-top: var(--s-2); font-size: var(--fs-h3); font-weight: 700; line-height: 1.35; }
+    .exp .chips { margin-top: auto; padding-top: var(--s-3); }
+
+    /* projects */
+    .projects-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); margin-top: var(--s-4); }
+    .project { display: flex; flex-direction: column; padding: var(--s-3); }
+    .cover { position: relative; overflow: hidden; border-radius: var(--radius-inner); background: var(--bg-alt); }
+    .cover-art {
+      display: block; width: 100%; height: auto;
+      transition: transform 500ms var(--ease-out);
+      transform-origin: 50% 60%;
+    }
+    .project-body { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4) var(--s-3) var(--s-3); flex: 1 1 auto; }
+    .project-body h3 { font-size: 1.375rem; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+    .project-body .chips { margin-top: auto; padding-top: var(--s-3); }
+    .status { color: var(--brown); font-size: var(--fs-small); }
+
+    .project-featured .project-body h3 { font-size: clamp(1.625rem, 1.25rem + 1.2vw, 2.25rem); letter-spacing: -0.02em; }
+    .project-featured .cover { display: grid; place-items: center; }
+    .mammo-art {
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--s-4);
+      width: 100%;
+      padding: var(--s-6) var(--s-5);
+      transition: transform 500ms var(--ease-out);
+    }
+    .scan { flex: none; width: clamp(92px, 26%, 150px); transition: transform 500ms var(--ease-out); }
+    .scan svg { display: block; width: 100%; height: auto; }
+    .flow-arrow { --od-icon-size: 1.25rem; color: var(--ink); }
+    .flow { position: relative; display: grid; gap: var(--s-2); }
+    .flow::before {
+      content: ""; position: absolute; left: 6px; top: 14px; bottom: 14px; width: 2px;
+      border-radius: 2px; background: var(--sand);
+    }
+    .flow li {
+      position: relative;
+      display: flex; align-items: center; gap: var(--s-3);
+      font-size: var(--fs-small); font-weight: 600; line-height: 1.5;
+      white-space: nowrap;
+    }
+    .flow li::before {
+      content: ""; flex: none; width: 14px; height: 14px; border-radius: 50%;
+      background: var(--c); box-shadow: 0 0 0 3px var(--bg-alt);
+    }
+    .flow li span { display: block; padding: 4px 12px; border-radius: 8px; background: var(--card); border: 1.5px solid var(--ink); }
+    .flow li.is-hot span { border-color: var(--red); }
+    .note {
+      display: flex; align-items: center; gap: var(--s-2);
+      align-self: flex-start;
+      margin-top: var(--s-2);
+      padding: 6px 12px; border-radius: 10px;
+      background: var(--chip-bg);
+      font-size: var(--fs-chip); font-weight: 500;
+    }
+    .note::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+
+    /* skills */
+    .skills-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6) var(--s-7); }
+    .skill-group h3 { font-size: 1.0625rem; font-weight: 700; margin-bottom: var(--s-3); }
+
+    /* education + certifications */
+    .edu-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-8) var(--s-7); }
+    .edu-grid h2 { margin-bottom: var(--s-5); }
+    .edu { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: var(--s-1); padding: var(--s-5); }
+    .edu::after {
+      content: ""; position: absolute; top: -48px; right: -48px;
+      width: 128px; height: 128px; border-radius: 50%;
+      background: var(--bg-alt);
+    }
+    .edu > * { position: relative; z-index: 1; }
+    .edu h3 { font-size: 1.375rem; font-weight: 700; }
+    .edu-meta { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-3); }
+    .certs { padding: var(--s-2) var(--s-5); }
+    .cert { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-4); padding-block: var(--s-4); }
+    .cert + .cert { border-top: 1px solid var(--line); }
+    .cert-name { font-weight: 600; line-height: 1.5; }
+    .cert .pill { flex: none; margin-top: 2px; }
+
+    /* contact (ink band) */
+    .contact { overflow: hidden; }
+    .contact-deco { position: absolute; display: block; pointer-events: none; }
+    .contact-deco-ring { right: -120px; bottom: -160px; width: 400px; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--on-ink-line); }
+    .contact-deco-dot { top: 64px; right: 14%; width: 16px; aspect-ratio: 1; border-radius: 50%; background: var(--red); }
+    .contact-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6) var(--s-7); align-items: start; }
+    .contact-grid h2 { margin-bottom: var(--s-3); }
+    .contact-lead { font-size: var(--fs-lead); color: var(--on-ink-soft); }
+    .contact-list { display: grid; }
+    .contact-list li + li { border-top: 1px solid var(--on-ink-line); }
+    .contact-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--s-4);
+      padding-block: var(--s-4);
+      color: var(--on-ink); text-decoration: none;
+    }
+    .contact-label { display: block; grid-column: 1; color: var(--on-ink-soft); font-size: var(--fs-chip); font-weight: 500; }
+    .contact-value {
+      display: block; grid-column: 1;
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 1rem + 1.1vw, 1.875rem); font-weight: 700; letter-spacing: -0.015em; line-height: 1.3;
+      overflow-wrap: anywhere;
+      transition: color var(--t-hover) ease-out;
+    }
+    .contact-row .od-icon {
+      grid-column: 2; grid-row: 1 / span 2;
+      --od-icon-size: 1.375rem; color: var(--red);
+      transition: transform var(--t-hover) ease-out;
+    }
+    .band-ink :focus-visible { outline-color: var(--on-ink); }
+
+    footer { padding-block: var(--s-6); }
+    .footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-3) var(--s-5); }
+    .footer-mark { display: inline-flex; align-items: center; gap: var(--s-2); font-family: var(--font-display); font-weight: 800; font-size: 1.125rem; letter-spacing: 0.02em; }
+    .footer-mark img { display: block; width: 28px; height: auto; flex: none; }
+    .footer-meta { color: var(--brown-soft); font-size: var(--fs-small); }
+
+    /* ---------- hover (pointer devices only) ---------- */
+    @media (hover: hover) {
+      a:hover { color: var(--red-deep); text-decoration-color: currentColor; }
+      .nav a:hover { color: var(--ink); }
+      .nav a:hover::after { transform: scaleX(1); }
+      .btn-primary:hover { background: var(--red-deep); color: #FFFFFF; transform: translateY(-2px); }
+      .btn-secondary:hover { background: var(--ink); color: var(--on-ink); transform: translateY(-2px); }
+      .btn-secondary:hover .od-icon { transform: translateY(2px); }
+      .brand:hover { color: var(--ink); }
+      .hero-links a:hover { color: var(--red-deep); }
+      .hero-links a:hover .od-icon { transform: translate(2px, -2px); }
+      .card.lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+      .project:hover .cover-art { transform: scale(1.04) translateY(-2px); }
+      .project:hover .scan { transform: scale(1.05) rotate(-2deg); }
+      .project:hover .mammo-art { transform: translateX(4px); }
+      .contact-row:hover { color: var(--on-ink); }
+      .contact-row:hover .contact-value { color: #FFFFFF; text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+      .contact-row:hover .od-icon { transform: translateX(4px); }
+    }
+
+    /* ---------- scroll reveal (armed by script only) ---------- */
+    .motion .reveal {
+      opacity: 0;
+      translate: 0 16px;
+      transition:
+        opacity var(--t-reveal) ease-out var(--d, 0ms),
+        translate var(--t-reveal) ease-out var(--d, 0ms),
+        transform var(--t-lift) var(--ease-out),
+        box-shadow var(--t-lift) var(--ease-out);
+    }
+    .motion .reveal.is-in { opacity: 1; translate: none; }
+    .motion .reveal:not(.is-in) .squiggle path { stroke-dashoffset: 1; }
+
+    /* ---------- breakpoints ---------- */
+    @media (min-width: 640px) {
+      .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 768px) {
+      :root { --gutter: 32px; }
+      .band { padding-block: var(--s-10); }
+      .projects-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .facts { padding: var(--s-6); }
+      .exp { padding: var(--s-6) var(--s-5); }
+    }
+    @media (min-width: 900px) {
+      .about-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: var(--s-9); }
+      .project-featured { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--s-3); }
+      .project-featured .project-body { padding: var(--s-6) var(--s-5) var(--s-5); justify-content: center; }
+      .project-featured .project-body .chips { margin-top: 0; }
+      .edu-grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+      .contact-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+    }
+    @media (min-width: 960px) {
+      .hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: var(--s-8); padding-block: var(--s-8) var(--s-10); }
+      .hero-visual { aspect-ratio: 1 / 1; max-width: 560px; justify-self: end; }
+      .hv-disc { width: 78%; }
+      .hv-ring { width: 88%; }
+      .mask-float { width: 52%; }
+    }
+    @media (min-width: 1024px) {
+      :root { --gutter: 40px; }
+      .exp-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .skills-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 420px) {
+      .facts-grid { grid-template-columns: minmax(0, 1fr); }
+      .mammo-art { gap: var(--s-3); padding: var(--s-5) var(--s-4); }
+      .flow li span { padding: 4px 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .curtain { display: none !important; }
+    }
+  </style>
+</head>
+<body id="top">
+  <div class="curtain" aria-hidden="true">
+    <div class="curtain-panel curtain-ink" style="--i: 2"></div>
+    <div class="curtain-panel curtain-red" style="--i: 1"></div>
+    <div class="curtain-panel curtain-white" style="--i: 0"><img class="curtain-mark" src="assets/d4ce-mask.png" width="556" height="604" alt=""></div>
+  </div>
+  <a class="skip-link" href="#home">Skip to content</a>
+
+  <main id="main">
+  <div class="hero-screen">
+    <header class="wrap">
+      <div class="topbar">
+        <a class="brand" href="#top">
+          <img src="assets/d4ce-mask.png" width="556" height="604" alt="">
+          Dandi Septian Yusniawan
+        </a>
+        <nav class="nav" aria-label="Sections">
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <section class="wrap hero" id="home" aria-label="Introduction">
+      <div class="hero-copy">
+        <h1 class="hero-name">
+          <span class="hero-word"><span style="--i: 0">Dandi</span></span>
+          <span class="hero-word"><span style="--i: 1">Septian</span></span>
+          <span class="hero-word"><span style="--i: 2">Yusniawan</span></span>
+        </h1>
+        <p class="hero-role hero-seq" style="--d: 200ms"><strong>Backend Developer</strong> — Python, Django REST, FastAPI</p>
+        <p class="hero-sentence hero-seq" style="--d: 260ms">Final-year Informatics student at Telkom University, based in Bandung. Open to backend roles.</p>
+        <div class="hero-actions hero-seq" style="--d: 320ms">
+          <a class="btn btn-primary" href="mailto:dsyusniawan@gmail.com">Email me</a>
+          <a class="btn btn-secondary" href="#projects">See projects
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10M4 9l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <ul class="hero-links hero-seq" style="--d: 380ms">
+          <li><a href="https://github.com/D4ce394" target="_blank" rel="noopener noreferrer">GitHub
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+          <li><a href="https://www.linkedin.com/in/dandisy" target="_blank" rel="noopener noreferrer">LinkedIn
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        </ul>
+      </div>
+
+      <div class="hero-visual hero-seq" style="--d: 120ms" aria-hidden="true">
+        <canvas class="dot-field"></canvas>
+        <span class="hv-disc"></span>
+        <span class="hv-ring"></span>
+        <span class="hv-red"></span>
+        <span class="hv-ink"></span>
+        <span class="hv-shadow"></span>
+        <div class="mask-float"><img class="mask-img" src="assets/d4ce-mask.png" width="556" height="604" alt=""></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- About -->
+  <section id="about" class="band band-line" aria-labelledby="about-title">
+    <div class="wrap about-grid">
+      <div class="about-text reveal">
+        <h2 id="about-title">Hi, I'm <span class="squiggle-word">Dandi<svg class="squiggle" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M2 9 C14 3 24 3 34 8 S56 13 66 7 S88 2 98 8 S112 11 118 6"/></svg></span>.</h2>
+        <p>Backend developer from Bandung. Final-year Informatics student at Telkom University (GPA 3.72/4.00, graduating 2027).</p>
+        <p>I build Python backends with Django REST Framework and FastAPI: REST API design, auth and role-based access, PostgreSQL modeling, payment gateway integration, Docker deployment. Open to backend roles.</p>
+        <p class="offclock">Off the clock: FPS games, Persona, Marvel movies, and anime.</p>
+      </div>
+
+      <aside class="card facts reveal" style="--d: 100ms" aria-labelledby="facts-title">
+        <div class="facts-head">
+          <h3 id="facts-title">Quick facts</h3>
+          <div class="facts-deco" aria-hidden="true"><span></span><span></span><span></span></div>
+        </div>
+        <dl class="facts-grid">
+          <div class="fact"><dt>Based in</dt><dd>Bandung, Indonesia</dd></div>
+          <div class="fact"><dt>Studying</dt><dd>Informatics, Telkom University</dd></div>
+          <div class="fact"><dt>GPA</dt><dd>3.72/4.00</dd></div>
+          <div class="fact"><dt>Graduating</dt><dd>2027</dd></div>
+          <div class="fact"><dt>Focus</dt><dd>Python backends: Django REST Framework, FastAPI</dd></div>
+          <div class="fact"><dt>Looking for</dt><dd>Backend roles</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section id="experience" class="band band-alt" aria-labelledby="experience-title">
+    <div class="wrap">
+      <h2 id="experience-title" class="reveal">Experience</h2>
+      <div class="exp-grid" data-stagger>
+        <article class="card lift exp">
+          <p class="pill">Oct 2026 – Present</p>
+          <h3>Freelance Backend Developer</h3>
+          <p class="org">Satelit HR Administration System (client project)</p>
+          <p>Backend for an HR admin system targeting 200+ users; designed the architecture end to end.</p>
+          <ul class="chips" aria-label="Stack">
+            <li class="chip">Django REST Framework</li><li class="chip">React</li><li class="chip">PostgreSQL</li>
+            <li class="chip">Redis + Celery</li><li class="chip">Nginx</li><li class="chip">Docker + GitHub Actions</li>
+          </ul>
+        </article>
+
+        <article class="card lift exp">
+          <p class="pill">Sep 2026 – Present</p>
+          <h3>Practicum Assistant</h3>
+          <p class="org">Informatics Laboratory, Telkom University</p>
+          <p>Run practicum sessions and review student code.</p>
+          <ul class="chips" aria-label="Stack">
+            <li class="chip">REST API</li><li class="chip">PostgreSQL</li><li class="chip">JWT</li>
+            <li class="chip">React</li><li class="chip">Laravel</li><li class="chip">Testing</li>
+          </ul>
+        </article>
+
+        <article class="card lift exp">
+          <p class="pill">Apr – Jun 2026</p>
+          <h3>Backend Developer Intern</h3>
+          <p class="org">HUMIC Research Center, Telkom University</p>
+          <p>MammoGuard: FastAPI backend serving a PyTorch model via REST; CLAHE + Grad-CAM image pipeline; brush/mask tool; single and bulk report export; Cloudflare R2 storage, Docker deployment.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="band" aria-labelledby="projects-title">
+    <div class="wrap">
+      <h2 id="projects-title" class="reveal">Projects</h2>
+
+      <article class="card lift project project-featured reveal">
+        <div class="cover">
+          <div class="mammo-art">
+            <div class="scan">
+              <svg viewBox="0 0 120 150" role="img" aria-label="Illustration: a mammogram scan with a highlighted Grad-CAM region">
+                <rect class="f-ink" width="120" height="150" rx="12"/>
+                <path class="f-brown" d="M14 18 C62 18 104 52 102 98 C100 126 72 138 14 134 Z"/>
+                <path class="f-sand-deep" opacity=".55" d="M14 34 C50 36 84 62 84 96 C84 116 64 124 14 120 Z"/>
+                <path class="st-white" stroke-opacity=".28" stroke-width="2" fill="none" stroke-linecap="round" d="M18 50 C40 60 56 76 60 100 M18 72 C34 80 44 92 46 110"/>
+                <circle class="f-red" opacity=".3" cx="66" cy="84" r="22"/>
+                <circle class="f-red" opacity=".7" cx="66" cy="84" r="13"/>
+                <circle class="f-white" cx="66" cy="84" r="5"/>
+                <rect class="st-white" x="40" y="58" width="52" height="52" rx="6" fill="none" stroke-width="2" stroke-dasharray="4 4"/>
+              </svg>
+            </div>
+            <svg class="od-icon flow-arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <ol class="flow" aria-label="MammoGuard pipeline">
+              <li style="--c: var(--sand-deep)"><span>Upload</span></li>
+              <li style="--c: var(--brown)"><span>CLAHE</span></li>
+              <li style="--c: var(--ink)"><span>PyTorch model</span></li>
+              <li class="is-hot" style="--c: var(--red)"><span>Grad-CAM</span></li>
+              <li style="--c: var(--ink)"><span>Report</span></li>
+            </ol>
+          </div>
+        </div>
+        <div class="project-body">
+          <p class="pill pill-red">Featured project</p>
+          <h3>MammoGuard</h3>
+          <p>AI mammogram analysis web app.</p>
+          <p><span class="lead-in">My part:</span> the FastAPI backend during the HUMIC internship (PyTorch model served via REST, R2 storage, Docker, report export).</p>
+          <ul class="chips" aria-label="Stack">
+            <li class="chip">FastAPI</li><li class="chip">PyTorch</li><li class="chip">Cloudflare R2</li><li class="chip">Docker</li>
+          </ul>
+          <p class="note">Registered copyright (DJKI) No. 001456509</p>
+        </div>
+      </article>
+
+      <div class="projects-grid" data-stagger>
+        <!-- FEAST -->
+        <article class="card lift project">
+          <div class="cover">
+            <svg class="cover-art" viewBox="0 0 480 300" role="img" aria-label="Illustration: one brand branching into three outlets, each with its own point-of-sale terminal">
+              <path class="st-sand-deep" fill="none" stroke-width="2" stroke-linecap="round" d="M240 84V106M108 106H372M108 106V126M240 106V126M372 106V126M108 170V194M240 170V194M372 170V194"/>
+              <rect class="f-red" x="168" y="36" width="144" height="48" rx="12"/>
+              <circle class="f-white" cx="194" cy="60" r="11"/>
+              <rect class="f-white" opacity=".9" x="214" y="52" width="76" height="8" rx="4"/>
+              <rect class="f-white" opacity=".55" x="214" y="65" width="46" height="6" rx="3"/>
+              <g class="f-card st-ink" stroke-width="2">
+                <rect x="52" y="126" width="112" height="44" rx="10"/>
+                <rect x="184" y="126" width="112" height="44" rx="10"/>
+                <rect x="316" y="126" width="112" height="44" rx="10"/>
+              </g>
+              <g class="f-cream-2">
+                <rect x="64" y="140" width="24" height="14" rx="3"/><rect x="128" y="140" width="24" height="14" rx="3"/>
+                <rect x="196" y="140" width="24" height="14" rx="3"/><rect x="260" y="140" width="24" height="14" rx="3"/>
+                <rect x="328" y="140" width="24" height="14" rx="3"/><rect x="392" y="140" width="24" height="14" rx="3"/>
+              </g>
+              <g class="f-ink">
+                <rect x="98" y="146" width="20" height="24" rx="3"/><rect x="230" y="146" width="20" height="24" rx="3"/><rect x="362" y="146" width="20" height="24" rx="3"/>
+              </g>
+              <g class="f-card st-ink" stroke-width="2">
+                <rect x="68" y="194" width="80" height="52" rx="8"/>
+                <rect x="200" y="194" width="80" height="52" rx="8"/>
+                <rect x="332" y="194" width="80" height="52" rx="8"/>
+              </g>
+              <g class="f-ink">
+                <rect x="78" y="206" width="36" height="6" rx="3"/><rect x="342" y="206" width="36" height="6" rx="3"/><rect x="210" y="206" width="28" height="6" rx="3"/>
+                <rect x="250" y="204" width="8" height="8" rx="1.5"/><rect x="262" y="204" width="8" height="8" rx="1.5"/>
+                <rect x="250" y="216" width="8" height="8" rx="1.5"/><rect x="263" y="217" width="6" height="6" rx="1"/>
+              </g>
+              <g class="f-sand">
+                <rect x="78" y="218" width="52" height="5" rx="2.5"/><rect x="78" y="228" width="28" height="5" rx="2.5"/>
+                <rect x="210" y="218" width="30" height="5" rx="2.5"/><rect x="210" y="228" width="22" height="5" rx="2.5"/>
+                <rect x="342" y="218" width="52" height="5" rx="2.5"/><rect x="342" y="228" width="28" height="5" rx="2.5"/>
+              </g>
+              <g class="f-ink">
+                <rect x="96" y="246" width="24" height="8"/><rect x="84" y="254" width="48" height="6" rx="3"/>
+                <rect x="228" y="246" width="24" height="8"/><rect x="216" y="254" width="48" height="6" rx="3"/>
+                <rect x="360" y="246" width="24" height="8"/><rect x="348" y="254" width="48" height="6" rx="3"/>
+              </g>
+            </svg>
+          </div>
+          <div class="project-body">
+            <h3>FEAST</h3>
+            <p>Multi-tenant F&amp;B POS (web + mobile) with a Brand–Outlet model, per-brand RBAC, QRIS/cash payments.</p>
+            <p><span class="lead-in">My part:</span> finalized, implemented and tested features.</p>
+            <ul class="chips" aria-label="Stack"><li class="chip">Django REST</li><li class="chip">React</li></ul>
+          </div>
+        </article>
+
+        <!-- Sajiin -->
+        <article class="card lift project">
+          <div class="cover">
+            <svg class="cover-art" viewBox="0 0 480 300" role="img" aria-label="Illustration: a point-of-sale screen with a menu grid and order total, next to a payment card">
+              <rect class="f-card st-ink" stroke-width="2" x="40" y="44" width="290" height="210" rx="16"/>
+              <circle class="f-ink" cx="62" cy="66" r="7"/>
+              <rect class="f-ink" x="76" y="62" width="70" height="8" rx="4"/>
+              <rect class="f-cream-2" x="270" y="60" width="44" height="12" rx="6"/>
+              <path class="st-sand" stroke-width="1.5" d="M41 86H329"/>
+              <g class="f-alt st-ink" stroke-width="1.5">
+                <rect x="56" y="100" width="56" height="52" rx="10"/><rect x="120" y="100" width="56" height="52" rx="10"/><rect x="184" y="100" width="56" height="52" rx="10"/>
+                <rect x="56" y="162" width="56" height="52" rx="10"/><rect x="120" y="162" width="56" height="52" rx="10"/><rect x="184" y="162" width="56" height="52" rx="10"/>
+              </g>
+              <g class="f-card st-ink" stroke-width="1.5">
+                <circle cx="84" cy="122" r="11"/><circle cx="148" cy="122" r="11"/><circle cx="212" cy="122" r="11"/>
+                <circle cx="84" cy="184" r="11"/><circle cx="148" cy="184" r="11"/><circle cx="212" cy="184" r="11"/>
+              </g>
+              <g class="f-sand-deep">
+                <rect x="66" y="140" width="36" height="5" rx="2.5"/><rect x="130" y="140" width="36" height="5" rx="2.5"/><rect x="194" y="140" width="36" height="5" rx="2.5"/>
+                <rect x="66" y="202" width="36" height="5" rx="2.5"/><rect x="130" y="202" width="36" height="5" rx="2.5"/><rect x="194" y="202" width="36" height="5" rx="2.5"/>
+              </g>
+              <rect class="f-ink" x="56" y="226" width="40" height="14" rx="7"/>
+              <rect class="f-cream-2" x="102" y="226" width="52" height="14" rx="7"/>
+              <rect class="f-cream-2" x="160" y="226" width="36" height="14" rx="7"/>
+              <rect class="f-chip" x="252" y="100" width="62" height="140" rx="10"/>
+              <g class="f-sand-deep">
+                <rect x="260" y="112" width="46" height="5" rx="2.5"/><rect x="260" y="124" width="34" height="5" rx="2.5"/>
+                <rect x="260" y="136" width="42" height="5" rx="2.5"/><rect x="260" y="148" width="30" height="5" rx="2.5"/>
+              </g>
+              <rect class="f-ink" x="260" y="206" width="46" height="22" rx="7"/>
+              <rect class="f-white" opacity=".85" x="268" y="215" width="30" height="4" rx="2"/>
+              <g transform="rotate(-8 392 196)">
+                <rect class="f-ink" x="322" y="150" width="140" height="88" rx="12"/>
+                <rect class="f-sand" x="338" y="170" width="24" height="18" rx="4"/>
+                <rect class="f-white" opacity=".85" x="338" y="206" width="78" height="7" rx="3.5"/>
+                <rect class="f-white" opacity=".45" x="338" y="219" width="44" height="6" rx="3"/>
+                <circle class="f-brown" cx="432" cy="178" r="10"/>
+                <circle class="f-sand-deep" opacity=".9" cx="444" cy="178" r="10"/>
+              </g>
+              <circle class="f-red" cx="446" cy="112" r="18"/>
+              <path class="st-white" d="M437 112l6 6 12-12" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="project-body">
+            <h3>Sajiin</h3>
+            <p>Web POS.</p>
+            <p><span class="lead-in">My part:</span> React frontend and Midtrans payment integration on Django REST.</p>
+            <ul class="chips" aria-label="Stack"><li class="chip">React</li><li class="chip">Midtrans</li><li class="chip">Django REST</li></ul>
+          </div>
+        </article>
+
+        <!-- IoT Poultry Counter -->
+        <article class="card lift project">
+          <div class="cover">
+            <svg class="cover-art" viewBox="0 0 480 300" role="img" aria-label="Illustration: a camera frame with three chickens, each marked by a detection box, and a counter">
+              <defs>
+                <clipPath id="iot-frame"><rect x="40" y="36" width="400" height="228" rx="14"/></clipPath>
+                <g id="hen">
+                  <path class="f-card st-ink" stroke-width="2" stroke-linejoin="round" d="M-22 -6 L-34 -20 L-30 2 Z"/>
+                  <ellipse class="f-card st-ink" stroke-width="2" cx="0" cy="0" rx="26" ry="19"/>
+                  <path class="st-ink" stroke-width="2" fill="none" stroke-linecap="round" d="M-8 -2 Q2 10 14 -2"/>
+                  <circle class="f-brown" cx="16" cy="-31" r="4"/>
+                  <circle class="f-brown" cx="23" cy="-32" r="4"/>
+                  <circle class="f-card st-ink" stroke-width="2" cx="20" cy="-20" r="11"/>
+                  <path class="f-sand-deep" d="M30 -22 L39 -19 L30 -16 Z"/>
+                  <circle class="f-ink" cx="23" cy="-22" r="1.8"/>
+                  <path class="st-ink" stroke-width="2" stroke-linecap="round" d="M-6 19V28M6 19V28"/>
+                </g>
+              </defs>
+              <g clip-path="url(#iot-frame)">
+                <rect class="f-card" x="40" y="36" width="400" height="228"/>
+                <rect class="f-cream-2" x="40" y="214" width="400" height="50"/>
+                <path class="st-sand" stroke-width="2" stroke-linecap="round" d="M70 240h14M150 252h10M260 244h16M380 250h12M420 236h8"/>
+              </g>
+              <path class="st-ink" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M56 72V52H76M404 52H424V72M424 228V248H404M76 248H56V228"/>
+              <rect class="f-ink" x="88" y="58" width="54" height="18" rx="9"/>
+              <circle class="f-sand-deep" cx="100" cy="67" r="4"/>
+              <rect class="f-white" opacity=".8" x="108" y="64" width="26" height="6" rx="3"/>
+              <rect class="f-card st-ink" stroke-width="1.5" x="330" y="58" width="82" height="28" rx="14"/>
+              <circle class="f-brown" cx="346" cy="72" r="6"/>
+              <g class="f-ink"><rect x="360" y="64" width="4" height="16" rx="2"/><rect x="370" y="64" width="4" height="16" rx="2"/><rect x="380" y="64" width="4" height="16" rx="2"/></g>
+              <use href="#hen" transform="translate(130 200)"/>
+              <use href="#hen" transform="translate(238 178)"/>
+              <use href="#hen" transform="translate(346 206)"/>
+              <g class="st-red" fill="none" stroke-width="2.5">
+                <rect x="90" y="156" width="86" height="80" rx="4"/>
+                <rect x="198" y="134" width="86" height="80" rx="4"/>
+                <rect x="306" y="162" width="86" height="80" rx="4"/>
+              </g>
+              <g class="f-red"><rect x="90" y="142" width="32" height="14" rx="3"/><rect x="198" y="120" width="32" height="14" rx="3"/><rect x="306" y="148" width="32" height="14" rx="3"/></g>
+              <g class="f-white" opacity=".9"><rect x="96" y="147" width="18" height="4" rx="2"/><rect x="204" y="125" width="18" height="4" rx="2"/><rect x="312" y="153" width="18" height="4" rx="2"/></g>
+            </svg>
+          </div>
+          <div class="project-body">
+            <h3>IoT Poultry Counter</h3>
+            <p>YOLO counts chickens from CCTV/video and sends real-time counts to Firebase, with a Svelte frontend.</p>
+            <ul class="chips" aria-label="Stack"><li class="chip">YOLO</li><li class="chip">Firebase</li><li class="chip">Svelte</li></ul>
+          </div>
+        </article>
+
+        <!-- Satelit -->
+        <article class="card lift project">
+          <div class="cover">
+            <svg class="cover-art" viewBox="0 0 480 300" role="img" aria-label="Illustration: layered system architecture, from client screens through a gateway and containerized services down to a database">
+              <path class="st-sand-deep" fill="none" stroke-width="2" stroke-linecap="round" d="M174 72V96M240 72V96M306 72V96M240 118V134M240 230V243"/>
+              <g class="f-card st-ink" stroke-width="2">
+                <rect x="144" y="34" width="60" height="38" rx="8"/><rect x="210" y="34" width="60" height="38" rx="8"/><rect x="276" y="34" width="60" height="38" rx="8"/>
+              </g>
+              <g class="f-ink"><rect x="154" y="46" width="40" height="6" rx="3"/><rect x="220" y="46" width="40" height="6" rx="3"/><rect x="286" y="46" width="40" height="6" rx="3"/></g>
+              <g class="f-sand"><rect x="154" y="56" width="26" height="5" rx="2.5"/><rect x="220" y="56" width="26" height="5" rx="2.5"/><rect x="286" y="56" width="26" height="5" rx="2.5"/></g>
+              <rect class="f-ink" x="120" y="96" width="240" height="22" rx="11"/>
+              <g class="f-white" opacity=".7"><circle cx="136" cy="107" r="3"/><circle cx="148" cy="107" r="3"/><circle cx="160" cy="107" r="3"/></g>
+              <rect class="f-card st-sand-deep" x="96" y="134" width="288" height="96" rx="16" stroke-width="2" stroke-dasharray="6 6"/>
+              <rect class="f-red" x="112" y="150" width="136" height="64" rx="10"/>
+              <rect class="f-white" opacity=".9" x="126" y="166" width="72" height="7" rx="3.5"/>
+              <rect class="f-white" opacity=".55" x="126" y="180" width="96" height="6" rx="3"/>
+              <rect class="f-white" opacity=".55" x="126" y="192" width="56" height="6" rx="3"/>
+              <path class="st-sand-deep" stroke-width="2" d="M248 164H260M248 200H260"/>
+              <rect class="f-card st-ink" stroke-width="2" x="260" y="150" width="52" height="28" rx="8"/>
+              <rect class="f-cream-2 st-ink" stroke-width="2" x="260" y="186" width="52" height="28" rx="8"/>
+              <rect class="f-sand" x="320" y="150" width="48" height="64" rx="8"/>
+              <path class="f-brown" d="M200 252V282A40 9 0 0 0 280 282V252Z"/>
+              <path class="st-sand-deep" fill="none" stroke-width="2" d="M200 267A40 9 0 0 0 280 267"/>
+              <ellipse class="f-sand-deep" cx="240" cy="252" rx="40" ry="9"/>
+            </svg>
+          </div>
+          <div class="project-body">
+            <h3>Satelit</h3>
+            <p>HR admin system architecture for 200+ users.</p>
+            <p class="status">Client project, in progress</p>
+            <ul class="chips" aria-label="Stack">
+              <li class="chip">Django REST Framework</li><li class="chip">React</li><li class="chip">PostgreSQL</li>
+              <li class="chip">Redis + Celery</li><li class="chip">Nginx</li><li class="chip">Docker + GitHub Actions</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="band band-alt" aria-labelledby="skills-title">
+    <div class="wrap">
+      <h2 id="skills-title" class="reveal">Skills</h2>
+      <div class="skills-grid" data-stagger>
+        <div class="skill-group">
+          <h3>Backend</h3>
+          <ul class="chips"><li class="chip">Python</li><li class="chip">Django REST Framework</li><li class="chip">FastAPI</li><li class="chip">Flask</li><li class="chip">Celery</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Data &amp; storage</h3>
+          <ul class="chips"><li class="chip">PostgreSQL</li><li class="chip">Redis</li><li class="chip">Firebase</li><li class="chip">Cloudflare R2</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Infrastructure</h3>
+          <ul class="chips"><li class="chip">Docker</li><li class="chip">GitHub Actions</li><li class="chip">Nginx</li><li class="chip">Linux</li><li class="chip">Git</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Frontend</h3>
+          <ul class="chips"><li class="chip">React</li><li class="chip">Tailwind CSS</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Machine learning</h3>
+          <ul class="chips"><li class="chip">PyTorch model serving</li><li class="chip">YOLO</li><li class="chip">Grad-CAM</li></ul>
+        </div>
+        <div class="skill-group">
+          <h3>Practices</h3>
+          <ul class="chips"><li class="chip">REST API design</li><li class="chip">JWT auth</li><li class="chip">RBAC</li><li class="chip">Payment gateways (Midtrans, QRIS)</li><li class="chip">Testing</li><li class="chip">Code review</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education + certifications -->
+  <section id="education" class="band" aria-label="Education and certifications">
+    <div class="wrap edu-grid" data-stagger>
+      <div>
+        <h2>Education</h2>
+        <article class="card edu">
+          <h3>Telkom University</h3>
+          <p class="org">Bachelor of Informatics</p>
+          <ul class="edu-meta">
+            <li class="pill">2023 – 2027</li>
+            <li class="pill pill-ink">GPA 3.72/4.00</li>
+          </ul>
+        </article>
+      </div>
+      <div>
+        <h2>Certifications</h2>
+        <ul class="card certs">
+          <li class="cert">
+            <div>
+              <p class="cert-name">Google IT Automation with Python</p>
+              <p class="org">Google</p>
+            </div>
+            <p class="pill">Jul 2026</p>
+          </li>
+          <li class="cert">
+            <div>
+              <p class="cert-name">Microsoft Azure AI Fundamentals (AI-900)</p>
+              <p class="org">Microsoft</p>
+            </div>
+            <p class="pill">Mar 2026</p>
+          </li>
+          <li class="cert">
+            <div>
+              <p class="cert-name">Data Classification and Summarization Using Granite</p>
+              <p class="org">IBM</p>
+            </div>
+            <p class="pill">Oct 2025</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="band band-ink contact" aria-labelledby="contact-title">
+    <span class="contact-deco contact-deco-ring" aria-hidden="true"></span>
+    <span class="contact-deco contact-deco-dot" aria-hidden="true"></span>
+    <div class="wrap contact-grid" data-stagger>
+      <div>
+        <h2 id="contact-title">Contact</h2>
+        <p class="contact-lead">Open to backend roles.</p>
+      </div>
+      <ul class="contact-list">
+        <li>
+          <a class="contact-row" href="mailto:dsyusniawan@gmail.com">
+            <span class="contact-label">Email</span>
+            <span class="contact-value">dsyusniawan@gmail.com</span>
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+        <li>
+          <a class="contact-row" href="https://github.com/D4ce394" target="_blank" rel="noopener noreferrer">
+            <span class="contact-label">GitHub</span>
+            <span class="contact-value">github.com/D4ce394</span>
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+        <li>
+          <a class="contact-row" href="https://www.linkedin.com/in/dandisy" target="_blank" rel="noopener noreferrer">
+            <span class="contact-label">LinkedIn</span>
+            <span class="contact-value">linkedin.com/in/dandisy</span>
+            <svg class="od-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-row">
+      <p class="footer-mark"><img src="assets/d4ce-mask.png" width="556" height="604" alt="">D4CE</p>
+      <p class="footer-meta">Dandi Septian Yusniawan · <span id="year">2026</span></p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const reduce = !root.classList.contains('anim');
+
+      const year = document.getElementById('year');
+      if (year) year.textContent = String(new Date().getFullYear());
+
+      const curtain = document.querySelector('.curtain');
+      if (curtain) setTimeout(() => curtain.remove(), 1300);
+
+      // Scroll reveals: content stays visible unless the observer is actually running.
+      if (!reduce && 'IntersectionObserver' in window) {
+        document.querySelectorAll('[data-stagger]').forEach((group) => {
+          Array.from(group.children).forEach((child, i) => {
+            child.classList.add('reveal');
+            child.style.setProperty('--d', `${Math.min(i, 6) * 50}ms`);
+          });
+        });
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+        root.classList.add('motion');
+      }
+
+      try {
+        const canvas = document.querySelector('.dot-field');
+        if (canvas) dotField(canvas, reduce);
+      } catch (err) {
+        // decorative only; the page works without it
+      }
+
+      function dotField(canvas, reduce) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const box = canvas.parentElement;
+        const hero = document.querySelector('.hero') || box;
+        const css = getComputedStyle(root);
+        const tone = (name) => css.getPropertyValue(name).trim();
+        const colors = { sand: tone('--sand'), ink: tone('--ink'), red: tone('--red') };
+        const live = !reduce && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        let w = 0, h = 0, pts = [], pointer = null, ripples = [], raf = 0, onScreen = true;
+
+        // seeded so the arrangement is identical on every load and resize
+        const seeded = (seed) => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+        function build() {
+          const rect = box.getBoundingClientRect();
+          w = rect.width; h = rect.height;
+          if (!w || !h) return;
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const rnd = seeded(23);
+          const count = w < 480 ? 26 : 46;
+          const R = Math.min(w, h) / 2;
+          pts = [];
+          for (let i = 0; i < count; i++) {
+            const angle = rnd() * Math.PI * 2;
+            const dist = R * (0.5 + rnd() * 0.48); // a loose orbit around the mask
+            const x = w / 2 + Math.cos(angle) * dist * (w / (2 * R)) * 0.92;
+            const y = h / 2 + Math.sin(angle) * dist * 0.92;
+            const k = rnd();
+            const ph = rnd() * Math.PI * 2;
+            const size = 0.8 + rnd() * 0.6;
+            const kind = i % 15 === 4 ? 3 : k < 0.58 ? 0 : k < 0.86 ? 1 : 2; // 0 sand dot, 1 thin circle, 2 ink dot, 3 red dot
+            pts.push({ hx: x, hy: y, x, y, vx: 0, vy: 0, ph, size, kind });
+          }
+          draw(performance.now() / 1000);
+        }
+
+        function draw(t) {
+          ctx.clearRect(0, 0, w, h);
+          for (const p of pts) {
+            const y = p.y + (live ? Math.sin(t * 0.8 + p.ph) * 1.6 : 0);
+            const s = p.size * (1 + Math.min(1, Math.hypot(p.x - p.hx, p.y - p.hy) / 28) * 0.4);
+            ctx.beginPath();
+            if (p.kind === 1) {
+              ctx.strokeStyle = colors.sand; ctx.lineWidth = 1.25;
+              ctx.arc(p.x, y, 6 * s, 0, Math.PI * 2); ctx.stroke();
+            } else {
+              ctx.fillStyle = p.kind === 0 ? colors.sand : p.kind === 2 ? colors.ink : colors.red;
+              ctx.arc(p.x, y, (p.kind === 3 ? 3.6 : p.kind === 2 ? 1.8 : 2.4) * s, 0, Math.PI * 2); ctx.fill();
+            }
+          }
+        }
+
+        function step(now) {
+          raf = 0;
+          for (const p of pts) {
+            let fx = (p.hx - p.x) * 0.05, fy = (p.hy - p.y) * 0.05;
+            if (pointer) {
+              const dx = p.x - pointer.x, dy = p.y - pointer.y, d = Math.hypot(dx, dy);
+              if (d < 140 && d > 0.001) { const f = (1 - d / 140) ** 2 * 3.4; fx += (dx / d) * f; fy += (dy / d) * f; }
+            }
+            for (const r of ripples) {
+              const dx = p.x - r.x, dy = p.y - r.y, d = Math.hypot(dx, dy) || 1, band = Math.abs(d - r.r);
+              if (band < 24) { const f = (1 - band / 24) * 2.2 * r.life; fx += (dx / d) * f; fy += (dy / d) * f; }
+            }
+            p.vx = (p.vx + fx) * 0.82; p.vy = (p.vy + fy) * 0.82;
+            p.x += p.vx; p.y += p.vy;
+          }
+          ripples.forEach((r) => { r.r += 5; r.life -= 0.02; });
+          ripples = ripples.filter((r) => r.life > 0);
+          draw(now / 1000);
+          if (onScreen && !document.hidden) raf = requestAnimationFrame(step);
+        }
+
+        const start = () => { if (live && !raf && onScreen && !document.hidden) raf = requestAnimationFrame(step); };
+        const clamp = (v) => Math.max(-0.5, Math.min(0.5, v));
+
+        build();
+        if ('ResizeObserver' in window) new ResizeObserver(build).observe(box);
+        else window.addEventListener('resize', build);
+        if (!live) return; // touch, small screens, reduced motion: a still arrangement
+
+        new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; start(); }).observe(box);
+        document.addEventListener('visibilitychange', start);
+
+        hero.addEventListener('pointermove', (e) => {
+          const r = canvas.getBoundingClientRect();
+          pointer = { x: e.clientX - r.left, y: e.clientY - r.top };
+          box.style.setProperty('--px', clamp(pointer.x / r.width - 0.5).toFixed(3));
+          box.style.setProperty('--py', clamp(pointer.y / r.height - 0.5).toFixed(3));
+        });
+        hero.addEventListener('pointerleave', () => {
+          pointer = null;
+          box.style.setProperty('--px', '0');
+          box.style.setProperty('--py', '0');
+        });
+        box.addEventListener('pointerdown', (e) => {
+          const r = canvas.getBoundingClientRect();
+          ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, r: 0, life: 1 });
+          if (ripples.length > 4) ripples.shift();
+        });
+        start();
+      }
+    })();
+  </script>
+</body>
+</html>

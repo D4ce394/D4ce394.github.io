@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nama Kamu — Designer & Developer</title>
+<meta name="description" content="Portofolio Nama Kamu: desain antarmuka, branding, dan web yang hangat dan seru.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* OD-LAYOUT-PRIMITIVES v1 — structure only: display, flex/grid, overflow, wrapping, ratio, geometry.
+   Put this @layer first; product CSS outside the layer wins ordinary layout rules.
+   Native hidden and closed-dialog states take precedence over component display rules. */
+@layer od-layout {
+  [hidden]:not([hidden="until-found" i]) { display: none !important; }
+  dialog:not([open]) { display: none !important; }
+
+  :where(.od-stack,.od-row,.od-row-top,.od-cluster,.od-grid,.od-field,.od-stat,.od-cell,.od-tile) > :where(*) { min-width: 0; }
+
+  .od-stack   { display: flex; flex-direction: column; gap: var(--od-gap, 8px); }
+  .od-row     { display: flex; align-items: center; gap: var(--od-gap, 8px); }
+  .od-row-top { display: flex; align-items: flex-start; gap: var(--od-gap, 8px); }
+  .od-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--od-gap, 8px); }
+  .od-fill    { flex: 1 1 0; min-width: 0; }
+  .od-fixed   { flex: none; }
+  .od-grid    { display: grid; gap: var(--od-gap, 12px); grid-template-columns: repeat(var(--od-cols, 3), minmax(0, 1fr)); }
+
+  .od-stat, .od-field, .od-cell { display: grid; gap: var(--od-gap, 2px); }
+  :where(.od-stat,.od-field,.od-cell) > :where(*) { display: block; }
+  .od-tile { display: grid; grid-template-rows: auto 1fr; }
+  :where(.od-tile) > :where(*) { display: block; }
+
+  .od-media { display: block; width: 100%; height: auto; aspect-ratio: var(--od-ratio, auto); }
+  .od-media-cover { object-fit: cover; }
+
+  .od-icon { display: inline-block; inline-size: var(--od-icon-size, 1em); block-size: var(--od-icon-size, 1em); flex: none; }
+
+  .od-truncate { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .od-clamp-2, .od-clamp-3 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .od-clamp-2 { -webkit-line-clamp: 2; }
+  .od-clamp-3 { -webkit-line-clamp: 3; }
+  .od-lines-2 { min-height: calc(2 * 1.4em); }
+  .od-nowrap  { white-space: nowrap; }
+  .od-keep    { word-break: keep-all; overflow-wrap: anywhere; }
+
+  .od-screen { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; }
+  .od-scroll { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+
+  .od-rail { display: flex; gap: var(--od-gap, 8px); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+             padding-inline: var(--od-rail-pad, 16px); scroll-padding-inline: var(--od-rail-pad, 16px); }
+  .od-rail::-webkit-scrollbar { display: none; }
+  :where(.od-rail) > :where(*) { flex: none; scroll-snap-align: start; }
+  :where(.od-rail) > :where(:last-child) { margin-inline-end: var(--od-rail-pad, 16px); }
+
+  .od-spacer { flex: none; visibility: hidden; pointer-events: none; }
+  .od-touch  { min-width: 44px; min-height: 44px; }
+}
+:root [hidden]:where(:not([hidden="until-found" i])) { display: none; }
+/* /OD-LAYOUT-PRIMITIVES v1 */
+
+/* ===== Design tokens — ubah di sini untuk mengganti seluruh nuansa ===== */
+:root {
+  --espresso: #1C1210;
+  --espresso-2: #2A1B17;
+  --espresso-3: #3A2620;
+  --ink: #FBEFE6;
+  --muted: #6E5D55;
+  --tomato: #FF5A36;
+  --tomato-ink: #C7391A;
+  --butter: #FFD166;
+  --salmon: #FF9EB0;
+  --bg: #FCFAF7;
+  --fg: #1C1210;
+  --surface: #F5F0EA;
+  --tint: #FFF0EA;
+  --line: #E8E0D8;
+  --shadow: 0 10px 30px rgba(28, 18, 16, .08);
+  --focus: var(--fg);
+
+  --font-display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+
+  --fs-body: 18px;
+  --fs-small: 16px;
+  --fs-h3: clamp(24px, 2.4vw, 32px);
+  --fs-h2: clamp(44px, 7vw, 104px);
+  --fs-hero: clamp(84px, 17vw, 240px);
+
+  --s-1: 8px; --s-2: 16px; --s-3: 24px; --s-4: 32px; --s-5: 48px; --s-6: 64px; --s-7: 96px; --s-8: 128px;
+  --radius: 16px;
+  --radius-sm: 8px;
+
+  --t-fast: 180ms;
+  --t-mid: 280ms;
+  --t-slow: 400ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in: cubic-bezier(.55, 0, 1, .45);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+
+  --wrap: 1280px;
+  --gutter: clamp(20px, 5vw, 64px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p, ul, ol, dl, dd { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+em { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 4px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.wrap { width: min(100% - var(--gutter) * 2, var(--wrap)); margin-inline: auto; }
+
+.skip {
+  position: absolute; left: var(--s-2); top: -100px; z-index: 100;
+  background: var(--butter); color: var(--espresso); padding: var(--s-1) var(--s-2);
+  border-radius: var(--radius-sm); font-weight: 700; text-decoration: none;
+}
+.skip:focus { top: var(--s-2); }
+
+/* ===== Progress + cursor ===== */
+.progress {
+  position: fixed; inset: 0 0 auto 0; height: 4px; z-index: 60;
+  background: var(--tomato); transform-origin: 0 50%; transform: scaleX(0);
+}
+.cursor {
+  position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none;
+  width: 0; height: 0; opacity: 0; transition: opacity var(--t-mid) var(--ease-out);
+}
+.cursor.is-on { opacity: 1; }
+.cursor span {
+  position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--tomato);
+  transition: transform var(--t-mid) var(--ease-spring), background-color var(--t-mid) var(--ease-out);
+}
+.cursor.is-big span { transform: scale(2); background-color: rgba(255, 90, 54, .18); }
+
+/* ===== Header ===== */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(252, 250, 247, .86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); min-height: 72px; }
+.logo {
+  font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: -.03em;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 2px; min-height: 44px;
+}
+.logo i { font-style: normal; color: var(--tomato); }
+.nav-links { display: flex; gap: var(--s-1); align-items: center; }
+.nav-links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s-2);
+  text-decoration: none; font-weight: 500; border-radius: 999px; position: relative;
+  transition: color var(--t-fast) var(--ease-out);
+}
+.nav-links a::after {
+  content: ""; position: absolute; left: var(--s-2); right: var(--s-2); bottom: 8px; height: 2px;
+  background: var(--tomato); transform: scaleX(0); transform-origin: 0 50%;
+  transition: transform var(--t-mid) var(--ease-out);
+}
+.nav-links a[aria-current="true"] { color: var(--tomato-ink); }
+.nav-links a[aria-current="true"]::after { transform: scaleX(1); }
+@media (hover: hover) {
+  .nav-links a:hover::after { transform: scaleX(1); }
+}
+.nav-cta {
+  display: inline-flex; align-items: center; gap: var(--s-1); min-height: 44px; padding: 0 var(--s-3);
+  border-radius: 999px; background: var(--tomato); color: var(--espresso); font-weight: 700; text-decoration: none;
+  transition: background-color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+}
+@media (hover: hover) { .nav-cta:hover { background: var(--butter); transform: translateY(-2px); } }
+.menu-btn {
+  display: none; align-items: center; justify-content: center; width: 48px; height: 48px;
+  border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer;
+  --od-icon-size: 22px;
+}
+.menu-btn .i-close { display: none; }
+.site-header[data-open] .menu-btn .i-open { display: none; }
+.site-header[data-open] .menu-btn .i-close { display: inline-block; }
+
+@media (max-width: 767px) {
+  .menu-btn { display: inline-flex; }
+  .nav-cta { display: none; }
+  .nav-links {
+    display: none; position: absolute; left: 0; right: 0; top: 100%;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: var(--s-2) var(--gutter) var(--s-4);
+  }
+  .site-header[data-open] .nav-links { display: flex; animation: drop var(--t-mid) var(--ease-out); }
+  .nav-links a { font-family: var(--font-display); font-size: 32px; font-weight: 700; min-height: 64px; padding: 0; }
+  .nav-links a::after { left: 0; right: auto; width: 48px; bottom: 12px; }
+}
+@keyframes drop { from { opacity: 0; transform: translateY(-8px); } }
+
+/* ===== Hero ===== */
+.hero { position: relative; padding-block: var(--s-7) var(--s-8); }
+.status {
+  display: inline-flex; align-items: center; gap: 12px; padding: 8px 16px 8px 12px;
+  border: 1px solid var(--line); background: #fff; border-radius: 999px; font-size: var(--fs-small); color: var(--muted);
+}
+.status .dot { width: 10px; height: 10px; border-radius: 50%; background: #7BE08A; position: relative; flex: none; }
+.status .dot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; background: #7BE08A;
+  animation: ping 1.8s var(--ease-out) infinite;
+}
+@keyframes ping { to { transform: scale(2.6); opacity: 0; } }
+
+.hero-name {
+  font-family: var(--font-display); font-size: var(--fs-hero); font-weight: 800;
+  line-height: .86; letter-spacing: -.05em; margin-top: var(--s-4);
+}
+.hero-name .line { display: block; }
+.hero-name .line + .line { padding-left: .55em; }
+.hero-name .line--serif { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -.02em; color: var(--tomato); }
+.ch {
+  display: inline-block; cursor: default;
+  transition: transform var(--t-mid) var(--ease-spring), color var(--t-fast) var(--ease-out);
+}
+.js .ch { animation: rise var(--t-slow) var(--ease-out) both; animation-delay: calc(120ms + var(--i, 0) * 40ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(.4em) rotate(8deg); } }
+@media (hover: hover) {
+  .ch:hover { transform: translateY(-.12em) rotate(-7deg); color: var(--tomato); }
+}
+
+.hero-lede {
+  display: grid; gap: var(--s-4); margin-top: var(--s-5);
+  grid-template-columns: minmax(0, 1fr);
+}
+.role-line { font-family: var(--font-display); font-size: clamp(26px, 3.4vw, 44px); font-weight: 600; line-height: 1.2; letter-spacing: -.02em; }
+.roles {
+  display: inline-grid; vertical-align: bottom; overflow: hidden; padding-bottom: .08em;
+  color: var(--tomato-ink);
+}
+.role-word {
+  grid-area: 1 / 1; white-space: nowrap;
+  transform: translateY(110%); opacity: 0;
+  transition: transform var(--t-slow) var(--ease-out), opacity var(--t-mid) var(--ease-out);
+}
+.role-word.is-on { transform: none; opacity: 1; }
+.role-word.is-out { transform: translateY(-110%); opacity: 0; transition-timing-function: var(--ease-in); transition-duration: var(--t-mid); }
+.hero-text { color: var(--muted); max-width: 52ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-1); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 56px; padding: 0 var(--s-4); border-radius: 999px; border: 2px solid transparent;
+  font-weight: 700; font-size: 17px; text-decoration: none; cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out);
+  --od-icon-size: 20px;
+}
+.btn .od-icon { transition: transform var(--t-mid) var(--ease-spring); }
+.btn-primary { background: var(--tomato); color: var(--espresso); }
+.btn-ghost { border-color: var(--fg); color: var(--fg); background: transparent; }
+@media (hover: hover) {
+  .btn:hover { transform: translateY(-3px); }
+  .btn:hover .od-icon { transform: translateX(4px) rotate(-45deg); }
+  .btn-primary:hover { background: var(--butter); }
+  .btn-ghost:hover { background: var(--fg); color: var(--bg); }
+}
+.btn:active { transform: translateY(0) scale(.98); }
+
+.hero-deco { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.burst {
+  position: absolute; right: 6%; top: 16%; width: clamp(96px, 13vw, 190px); height: auto;
+  animation: spin 24s linear infinite;
+}
+.badge {
+  position: absolute; right: var(--gutter); bottom: var(--s-5);
+  width: 132px; height: 132px; pointer-events: auto;
+  display: grid; place-items: center; border-radius: 50%; text-decoration: none;
+  --od-icon-size: 28px;
+}
+.badge svg.ring { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 14s linear infinite; }
+.badge .core {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--butter); color: var(--espresso);
+  display: grid; place-items: center; transition: transform var(--t-mid) var(--ease-spring);
+}
+@media (hover: hover) { .badge:hover .core { transform: scale(1.12) rotate(-12deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (min-width: 1024px) {
+  .hero { padding-block: var(--s-8) 160px; }
+  .hero-lede { grid-template-columns: 1.1fr 1fr; align-items: end; }
+}
+@media (max-width: 767px) {
+  .hero { padding-block: var(--s-6) var(--s-7); }
+  .burst { right: -40px; top: 6%; opacity: .9; }
+  .badge { display: none; }
+}
+
+/* ===== Marquee ===== */
+.marquee {
+  background: var(--butter); color: var(--espresso);
+  padding-block: var(--s-2); overflow: hidden;
+}
+.marquee-track { display: flex; width: max-content; animation: slide 32s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee ul { display: flex; align-items: center; gap: var(--s-4); padding-right: var(--s-4); }
+.marquee li {
+  display: flex; align-items: center; gap: var(--s-4); white-space: nowrap;
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 4vw, 48px); letter-spacing: -.02em;
+}
+.marquee li:nth-child(even) { font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+.marquee .star { width: 28px; height: 28px; color: var(--tomato); flex: none; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* ===== Sections ===== */
+section { scroll-margin-top: 72px; }
+.section { padding-block: var(--s-8); }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; font-size: var(--fs-small); font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.eyebrow b { font-family: var(--font-display); color: var(--tomato); letter-spacing: 0; }
+.h2 {
+  font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 800; line-height: .95; letter-spacing: -.045em;
+  margin-top: var(--s-2);
+}
+.h2 em { color: var(--tomato-ink); }
+
+/* reveal */
+.js .reveal { opacity: 0; transform: translateY(32px); transition: opacity var(--t-slow) var(--ease-out), transform var(--t-slow) var(--ease-out); transition-delay: calc(var(--i, 0) * 50ms); }
+.js .reveal.is-in { opacity: 1; transform: none; }
+
+/* ===== About ===== */
+.about-grid { display: grid; gap: var(--s-6); align-items: center; }
+@media (min-width: 900px) { .about-grid { grid-template-columns: 5fr 7fr; gap: var(--s-7); } }
+.photo {
+  position: relative; max-width: 420px; width: 100%; margin-inline: auto;
+  transform: rotate(-2deg); transition: transform var(--t-slow) var(--ease-spring);
+}
+@media (hover: hover) { .photo:hover { transform: rotate(1deg) scale(1.02); } }
+.photo-card {
+  aspect-ratio: 4 / 5; border-radius: var(--radius); background: var(--salmon); overflow: hidden;
+  position: relative; display: grid; place-items: end start; padding: var(--s-3);
+  box-shadow: var(--shadow);
+}
+.photo-card .sun { position: absolute; width: 70%; aspect-ratio: 1; border-radius: 50%; background: var(--butter); left: 15%; top: 14%; }
+.photo-card .hill { position: absolute; width: 140%; aspect-ratio: 2; border-radius: 50%; background: var(--tomato); left: -20%; bottom: -40%; }
+.photo-card .label {
+  position: relative; background: var(--espresso); color: var(--ink); padding: 8px 14px; border-radius: 999px;
+  font-size: var(--fs-small); font-weight: 600;
+}
+.tape {
+  position: absolute; top: -14px; left: 50%; width: 110px; height: 32px; margin-left: -55px;
+  background: rgba(255, 255, 255, .7); transform: rotate(3deg); z-index: 1;
+}
+.about-copy p.big {
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.15; letter-spacing: -.025em;
+  margin-top: var(--s-3);
+}
+.about-copy p.big em { color: var(--tomato-ink); }
+.about-copy p.body { color: var(--muted); margin-top: var(--s-3); max-width: 60ch; }
+.facts { display: grid; gap: var(--s-3); margin-top: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.facts .od-field { border-top: 1px solid var(--line); padding-top: var(--s-2); --od-gap: 4px; }
+.facts dt { font-size: var(--fs-small); color: var(--muted); }
+.facts dd { font-weight: 700; font-size: 20px; }
+
+/* ===== Works ===== */
+.works-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s-4); }
+.filters { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.filter {
+  min-height: 44px; padding: 0 var(--s-3); border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: #fff; color: var(--fg); font-weight: 600;
+  transition: background-color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+@media (hover: hover) { .filter:hover { border-color: var(--fg); } }
+.filter[aria-pressed="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.works-count { color: var(--muted); font-size: var(--fs-small); margin-top: var(--s-3); }
+
+.works { display: grid; gap: var(--s-5) var(--s-4); margin-top: var(--s-5); }
+@media (min-width: 768px) {
+  .works { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .works .work:nth-child(even) { margin-top: var(--s-7); }
+  .works.is-filtered .work:nth-child(even) { margin-top: 0; }
+}
+.work { position: relative; }
+.work.pop { animation: pop var(--t-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 50ms); }
+@keyframes pop { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+
+.art {
+  position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); overflow: hidden;
+  transition: transform var(--t-slow) var(--ease-out), box-shadow var(--t-mid) var(--ease-out);
+}
+.art > * { position: absolute; transition: transform var(--t-slow) var(--ease-spring); }
+.art .tag {
+  left: 16px; top: 16px; z-index: 2; background: var(--espresso); color: var(--ink);
+  font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px;
+}
+@media (hover: hover) {
+  .work:hover .art { transform: translateY(-6px); box-shadow: var(--shadow); }
+}
+
+/* art 1 — app pemesanan kopi */
+.art-1 { background: var(--butter); }
+.art-1 .phone { width: 34%; aspect-ratio: 9 / 18; left: 33%; top: 14%; background: var(--espresso); border-radius: 22px; transform: rotate(-6deg); }
+.art-1 .phone::before { content: ""; position: absolute; left: 12%; right: 12%; top: 10%; height: 34%; border-radius: 12px; background: var(--tomato); }
+.art-1 .phone::after { content: ""; position: absolute; left: 12%; right: 30%; top: 52%; height: 6%; border-radius: 6px; background: var(--ink); box-shadow: 0 22px 0 -2px var(--muted), 0 44px 0 -2px var(--salmon); }
+.art-1 .cup { width: 18%; aspect-ratio: 1; border-radius: 50%; background: var(--salmon); right: 12%; top: 18%; }
+.art-1 .bean { width: 12%; aspect-ratio: 1 / 1.4; border-radius: 50%; background: var(--espresso); left: 12%; bottom: 14%; transform: rotate(30deg); }
+@media (hover: hover) {
+  .work:hover .art-1 .phone { transform: rotate(4deg) translateY(-12px); }
+  .work:hover .art-1 .cup { transform: translate(-16px, 16px) scale(1.15); }
+  .work:hover .art-1 .bean { transform: rotate(-40deg) translateX(12px); }
+}
+
+/* art 2 — identitas toko roti */
+.art-2 { background: var(--salmon); }
+.art-2 .ring { width: 56%; aspect-ratio: 1; border-radius: 50%; border: 22px solid var(--tomato); left: 22%; top: 10%; }
+.art-2 .letter { font-family: var(--font-serif); font-style: italic; font-size: clamp(96px, 14vw, 180px); line-height: 1; color: var(--espresso); left: 50%; top: 50%; transform: translate(-50%, -54%); }
+.art-2 .dot { width: 14%; aspect-ratio: 1; border-radius: 50%; background: var(--butter); right: 10%; bottom: 12%; }
+@media (hover: hover) {
+  .work:hover .art-2 .ring { transform: scale(1.08) rotate(20deg); }
+  .work:hover .art-2 .letter { transform: translate(-50%, -54%) rotate(-10deg) scale(1.08); }
+  .work:hover .art-2 .dot { transform: translate(-30px, -20px); }
+}
+
+/* art 3 — situs festival musik */
+.art-3 { background: var(--tomato); }
+.art-3 .bars { inset: 22% 10% 22% 10%; display: flex; align-items: center; gap: 4%; }
+.art-3 .bars i { flex: 1; height: var(--h); background: var(--butter); border-radius: 999px; transition: transform var(--t-slow) var(--ease-spring); }
+.art-3 .sun { width: 22%; aspect-ratio: 1; border-radius: 50%; background: var(--espresso); left: 8%; top: 8%; }
+@media (hover: hover) {
+  .work:hover .art-3 .bars i:nth-child(odd) { transform: scaleY(.6); }
+  .work:hover .art-3 .bars i:nth-child(even) { transform: scaleY(1.25); }
+  .work:hover .art-3 .sun { transform: translateX(40px); }
+}
+
+/* art 4 — dasbor kebiasaan */
+.art-4 { background: var(--surface); }
+.art-4 .grid { inset: 18% 14%; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6%; align-content: center; }
+.art-4 .grid i { aspect-ratio: 1; border-radius: 6px; background: var(--line); transition: transform var(--t-mid) var(--ease-spring); }
+.art-4 .grid i.on { background: var(--butter); }
+.art-4 .grid i.hot { background: var(--tomato); }
+.art-4 .grid i.pink { background: var(--salmon); }
+@media (hover: hover) {
+  .work:hover .art-4 .grid i:nth-child(3n) { transform: scale(.7) rotate(45deg); }
+}
+
+.work-meta { margin-top: var(--s-2); --od-gap: var(--s-2); }
+.work-title { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+.work-cat { color: var(--muted); font-size: var(--fs-small); }
+.work-open {
+  width: 56px; height: 56px; border-radius: 50%; border: 1px solid var(--fg); background: transparent; cursor: pointer;
+  display: grid; place-items: center; --od-icon-size: 22px;
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), transform var(--t-mid) var(--ease-spring);
+}
+.work-open::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius); }
+@media (hover: hover) {
+  .work:hover .work-open { background: var(--tomato); border-color: var(--tomato); color: var(--espresso); transform: rotate(-45deg); }
+}
+
+/* ===== Process (tomato block) ===== */
+.process { background: var(--tint); }
+.steps { display: grid; gap: var(--s-4); margin-top: var(--s-6); }
+@media (min-width: 768px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.step {
+  border-top: 1px solid rgba(199, 57, 26, .3); padding-top: var(--s-3);
+  display: grid; gap: var(--s-2); align-content: start;
+}
+.step .num {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(56px, 6vw, 80px); line-height: 1; letter-spacing: -.05em;
+  display: inline-block; color: var(--tomato-ink); transition: transform var(--t-mid) var(--ease-spring);
+}
+@media (hover: hover) { .step:hover .num { transform: rotate(-8deg) translateY(-6px); } }
+.step h3 { font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+.step p { max-width: 40ch; color: var(--muted); }
+
+/* ===== Playground ===== */
+.play-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s-3); }
+.play-hint { color: var(--muted); margin-top: var(--s-2); max-width: 52ch; }
+.playfield {
+  position: relative; margin-top: var(--s-5); height: 460px; border-radius: var(--radius);
+  background: var(--surface); overflow: hidden; touch-action: none;
+}
+@media (max-width: 767px) { .playfield { height: 520px; } }
+.sticker {
+  position: absolute; left: 0; top: 0; z-index: var(--z, 1);
+  transform: translate(var(--x, 0px), var(--y, 0px)) rotate(var(--r, 0deg));
+  border: 0; cursor: grab; user-select: none; touch-action: none;
+  font-family: var(--font-display); font-weight: 700; font-size: 19px; line-height: 1.15; text-align: center;
+  color: var(--espresso); display: grid; place-items: center; padding: 12px 20px;
+  box-shadow: 0 4px 12px rgba(28, 18, 16, .1);
+  transition: box-shadow var(--t-fast) var(--ease-out);
+}
+.playfield.is-shuffling .sticker { transition: transform var(--t-slow) var(--ease-spring), box-shadow var(--t-fast) var(--ease-out); }
+.sticker.is-drag { cursor: grabbing; box-shadow: 0 16px 32px rgba(28, 18, 16, .18); }
+.sticker:focus-visible { outline-offset: 4px; }
+.sticker em { font-size: 1.15em; }
+.s-pill   { background: var(--butter); border-radius: 999px; min-height: 64px; }
+.s-circle { background: var(--salmon); border-radius: 50%; width: 136px; height: 136px; padding: 16px; }
+.s-square { background: #fff; border-radius: 18px; width: 148px; min-height: 108px; }
+.s-blob   { background: var(--tomato); border-radius: 58% 42% 52% 48% / 46% 56% 44% 54%; width: 168px; min-height: 120px; }
+.s-ticket { background: var(--butter); border-radius: 8px; min-height: 64px; }
+.shuffle { --od-icon-size: 20px; }
+
+/* ===== Contact (butter block) ===== */
+.contact { background: var(--butter); color: var(--espresso); --focus: var(--espresso); }
+.contact .eyebrow, .contact .eyebrow b { color: var(--espresso); }
+.contact-title {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(52px, 9vw, 140px); line-height: .92; letter-spacing: -.05em;
+  margin-top: var(--s-3); max-width: 13ch;
+}
+.contact-title em { color: var(--tomato); -webkit-text-stroke: 0; }
+.contact-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-5); }
+.contact .btn-primary { background: var(--espresso); color: var(--butter); }
+.contact .btn-ghost { border-color: var(--espresso); color: var(--espresso); }
+@media (hover: hover) {
+  .contact .btn-primary:hover { background: var(--tomato); color: var(--espresso); }
+  .contact .btn-ghost:hover { background: var(--espresso); color: var(--butter); }
+}
+.email-text { font-family: var(--font-display); font-weight: 600; }
+.socials { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin-top: var(--s-6); border-top: 1px solid rgba(28, 18, 16, .25); padding-top: var(--s-3); }
+.socials a {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; font-size: 20px; text-decoration: none;
+  --od-icon-size: 18px; transition: color var(--t-fast) var(--ease-out);
+}
+.socials a .od-icon { transition: transform var(--t-mid) var(--ease-spring); }
+@media (hover: hover) { .socials a:hover { color: #B8300F; } .socials a:hover .od-icon { transform: rotate(45deg); } }
+
+/* ===== Footer ===== */
+.site-footer { padding-block: var(--s-5); }
+.footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-2); color: var(--muted); font-size: var(--fs-small); }
+.to-top {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 var(--s-2);
+  background: transparent; border: 1px solid var(--line); border-radius: 999px; color: var(--fg); cursor: pointer; font-weight: 600;
+  --od-icon-size: 18px; transition: border-color var(--t-fast) var(--ease-out);
+}
+@media (hover: hover) { .to-top:hover { border-color: var(--fg); } }
+
+/* ===== Dialog ===== */
+.case {
+  width: min(100% - 32px, 720px); max-height: calc(100dvh - 48px); padding: 0; border: 0;
+  border-radius: var(--radius); background: #fff; color: var(--fg); overflow: auto;
+}
+.case[open] { animation: caseIn var(--t-slow) var(--ease-out); }
+.case::backdrop { background: rgba(28, 18, 16, .45); }
+@keyframes caseIn { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+.case-art { aspect-ratio: 16 / 7; border-radius: 0; }
+.case-body { padding: var(--s-4); display: grid; gap: var(--s-3); }
+.case-top { --od-gap: var(--s-2); }
+.case-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; letter-spacing: -.03em; }
+.case-cat { font-weight: 600; color: #6B4A3E; }
+.case-close {
+  width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--espresso); background: transparent; cursor: pointer;
+  display: grid; place-items: center; --od-icon-size: 22px; transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+@media (hover: hover) { .case-close:hover { background: var(--espresso); color: var(--ink); } }
+.case-desc { max-width: 60ch; }
+.case-meta { display: grid; gap: var(--s-2); grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.case-meta .od-field { border-top: 1px solid var(--line); padding-top: var(--s-1); }
+.case-meta dt { font-size: 14px; font-weight: 600; color: #6B4A3E; }
+.case-meta dd { font-weight: 700; }
+.case-note { font-size: var(--fs-small); background: var(--butter); padding: var(--s-2); border-radius: var(--radius-sm); }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 80; max-width: calc(100% - 32px);
+  background: var(--espresso); color: var(--ink); border: 2px solid var(--butter);
+  padding: 14px 20px; border-radius: 999px; font-weight: 600;
+  transform: translate(-50%, 24px); opacity: 0;
+  transition: transform var(--t-mid) var(--ease-in), opacity 180ms var(--ease-in);
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; transition: transform var(--t-mid) var(--ease-spring), opacity var(--t-mid) var(--ease-out); }
+
+/* ===== Reduced motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+  .marquee-track, .burst, .badge svg.ring, .status .dot::after { animation: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .cursor { display: none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#karya">Lewati ke karya</a>
+<div class="progress" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span></span></div>
+
+<!-- Ikon dipakai ulang (satu keluarga: garis 2px, ujung bulat) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-ne" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3M4 17h3c2 0 3-1.5 4-3.3M13.5 9.3C14.5 8 15.4 7 17 7h3M17 4l3 3-3 3M17 14l3 3-3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <nav class="wrap nav" aria-label="Navigasi utama">
+    <a class="logo" href="#top" aria-label="Nama Kamu, ke awal halaman">nk<i>.</i></a>
+    <div class="nav-links" id="nav-links">
+      <a href="#karya">Karya</a>
+      <a href="#tentang">Tentang</a>
+      <a href="#proses">Proses</a>
+      <a href="#main">Main-main</a>
+      <a href="#kontak">Kontak</a>
+    </div>
+    <a class="nav-cta" href="#kontak">Ngobrol yuk <svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Buka menu">
+      <svg class="od-icon i-open" aria-hidden="true"><use href="#i-menu"/></svg>
+      <svg class="od-icon i-close" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main id="top">
+  <!-- ===== HERO ===== -->
+  <section class="hero" aria-labelledby="hero-name">
+    <div class="hero-deco" aria-hidden="true">
+      <svg class="burst" viewBox="0 0 200 200" width="260" height="260">
+        <path fill="#FFD166" d="M100 8l14 42 38-24-12 44 46 4-38 26 32 34-46-6 4 46-38-28-38 28 4-46-46 6 32-34-38-26 46-4-12-44 38 24z"/>
+      </svg>
+    </div>
+
+    <div class="wrap">
+      <p class="status"><span class="dot" aria-hidden="true"></span>Terbuka untuk kolaborasi baru</p>
+      <h1 class="hero-name" id="hero-name" data-split>
+        <span class="line">Nama</span>
+        <span class="line line--serif">Kamu.</span>
+      </h1>
+
+      <div class="hero-lede">
+        <p class="role-line">
+          <span class="sr-only">Designer, developer, dan pencerita visual</span>
+          <span aria-hidden="true">Saya
+            <span class="roles">
+              <span class="role-word is-on">designer</span>
+              <span class="role-word">developer</span>
+              <span class="role-word">pencerita visual</span>
+              <span class="role-word">tukang ngulik</span>
+            </span>
+          </span><br aria-hidden="true">
+          <span aria-hidden="true">yang bikin hal digital terasa hangat.</span>
+        </p>
+        <div class="od-stack" style="--od-gap: 24px">
+          <p class="hero-text">Saya merancang antarmuka, identitas visual, dan website yang enak dilihat, gampang dipakai, dan punya sedikit kejutan kecil di dalamnya. Ganti paragraf ini dengan cerita singkatmu.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#karya">Lihat karya <svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost" href="#kontak">Hubungi saya</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a class="badge" href="#karya" aria-label="Gulir ke karya">
+      <svg class="ring" viewBox="0 0 132 132" aria-hidden="true">
+        <defs><path id="circ" d="M66 66m-50 0a50 50 0 1 1 100 0a50 50 0 1 1-100 0"/></defs>
+        <text font-family="DM Sans, sans-serif" font-size="13" font-weight="700" letter-spacing="3.2" fill="#1C1210"><textPath href="#circ">GULIR KE BAWAH ✦ LIHAT KARYA ✦ </textPath></text>
+      </svg>
+      <span class="core"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow-down"/></svg></span>
+    </a>
+  </section>
+
+  <!-- ===== MARQUEE ===== -->
+  <div class="marquee" aria-label="Keahlian: UI Design, Branding, Web Development, Prototyping, Motion, Ilustrasi, Design System">
+    <div class="marquee-track" aria-hidden="true">
+      <ul>
+        <li>UI Design <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Branding <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Web Development <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Prototyping <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Motion <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Ilustrasi <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+        <li>Design System <svg class="star" viewBox="0 0 24 24"><path fill="currentColor" d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z"/></svg></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== WORKS ===== -->
+  <section class="section" id="karya" aria-labelledby="karya-title">
+    <div class="wrap">
+      <div class="works-head">
+        <div class="reveal">
+          <p class="eyebrow"><b>01</b> Karya</p>
+          <h2 class="h2" id="karya-title">Karya <em>pilihan</em></h2>
+        </div>
+        <div class="filters reveal" role="group" aria-label="Saring karya berdasarkan kategori">
+          <button class="filter" type="button" data-filter="semua" aria-pressed="true">Semua</button>
+          <button class="filter" type="button" data-filter="uiux" aria-pressed="false">UI/UX</button>
+          <button class="filter" type="button" data-filter="branding" aria-pressed="false">Branding</button>
+          <button class="filter" type="button" data-filter="web" aria-pressed="false">Web</button>
+        </div>
+      </div>
+      <p class="works-count" id="works-count" aria-live="polite">4 proyek</p>
+
+      <div class="works" id="works">
+        <article class="work reveal" data-cat="uiux">
+          <div class="art art-1" aria-hidden="true"><span class="tag">Contoh</span><span class="phone"></span><span class="cup"></span><span class="bean"></span></div>
+          <div class="work-meta od-row">
+            <div class="od-fill od-field">
+              <h3 class="work-title">Aplikasi Pesan Kopi</h3>
+              <p class="work-cat">UI/UX · Aplikasi mobile</p>
+            </div>
+            <button class="work-open od-fixed" type="button" data-id="kopi" aria-label="Lihat detail Aplikasi Pesan Kopi"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <article class="work reveal" data-cat="branding">
+          <div class="art art-2" aria-hidden="true"><span class="tag">Contoh</span><span class="ring"></span><span class="letter">b</span><span class="dot"></span></div>
+          <div class="work-meta od-row">
+            <div class="od-fill od-field">
+              <h3 class="work-title">Identitas Toko Roti</h3>
+              <p class="work-cat">Branding · Logo & kemasan</p>
+            </div>
+            <button class="work-open od-fixed" type="button" data-id="roti" aria-label="Lihat detail Identitas Toko Roti"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <article class="work reveal" data-cat="web">
+          <div class="art art-3" aria-hidden="true"><span class="tag">Contoh</span><span class="sun"></span><span class="bars"><i style="--h:40%"></i><i style="--h:80%"></i><i style="--h:56%"></i><i style="--h:100%"></i><i style="--h:64%"></i><i style="--h:32%"></i><i style="--h:72%"></i></span></div>
+          <div class="work-meta od-row">
+            <div class="od-fill od-field">
+              <h3 class="work-title">Situs Festival Musik</h3>
+              <p class="work-cat">Web · Desain & pengembangan</p>
+            </div>
+            <button class="work-open od-fixed" type="button" data-id="festival" aria-label="Lihat detail Situs Festival Musik"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </article>
+
+        <article class="work reveal" data-cat="uiux">
+          <div class="art art-4" aria-hidden="true"><span class="tag">Contoh</span><span class="grid"></span></div>
+          <div class="work-meta od-row">
+            <div class="od-fill od-field">
+              <h3 class="work-title">Dasbor Kebiasaan</h3>
+              <p class="work-cat">UI/UX · Web app</p>
+            </div>
+            <button class="work-open od-fixed" type="button" data-id="kebiasaan" aria-label="Lihat detail Dasbor Kebiasaan"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="section" id="tentang" aria-labelledby="tentang-title" style="padding-top: 0">
+    <div class="wrap about-grid">
+      <figure class="photo reveal" style="margin:0">
+        <span class="tape" aria-hidden="true"></span>
+        <div class="photo-card" role="img" aria-label="Tempat foto profil, belum diisi">
+          <span class="sun" aria-hidden="true"></span>
+          <span class="hill" aria-hidden="true"></span>
+          <span class="label">Foto kamu di sini</span>
+        </div>
+      </figure>
+
+      <div class="about-copy">
+        <p class="eyebrow reveal"><b>02</b> Tentang</p>
+        <h2 class="sr-only" id="tentang-title">Tentang saya</h2>
+        <p class="big reveal" style="--i:1">Halo! Saya <em>Nama Kamu</em> — suka mengubah ide yang berantakan jadi sesuatu yang rapi, hangat, dan bikin orang senyum.</p>
+        <p class="body reveal" style="--i:2">Ceritakan di sini perjalananmu: dari mana kamu mulai, apa yang paling kamu nikmati saat berkarya, dan jenis proyek yang ingin kamu kerjakan berikutnya. Dua sampai tiga kalimat sudah cukup.</p>
+        <dl class="facts">
+          <div class="od-field reveal" style="--i:3"><dt>Basis</dt><dd>Kota Kamu, Indonesia</dd></div>
+          <div class="od-field reveal" style="--i:4"><dt>Fokus</dt><dd>UI, branding, web</dd></div>
+          <div class="od-field reveal" style="--i:5"><dt>Lagi belajar</dt><dd>3D & motion</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROCESS ===== -->
+  <section class="section process" id="proses" aria-labelledby="proses-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>03</b> Proses</p>
+        <h2 class="h2" id="proses-title">Cara saya <em>bekerja</em></h2>
+      </div>
+      <ol class="steps">
+        <li class="step reveal" style="--i:0"><span class="num" aria-hidden="true">01</span><h3>Dengar dulu</h3><p>Ngobrol soal tujuan, audiens, dan batasan sebelum membuka software apa pun.</p></li>
+        <li class="step reveal" style="--i:1"><span class="num" aria-hidden="true">02</span><h3>Sketsa kasar</h3><p>Banyak ide di kertas, supaya satu ide yang paling pas bisa muncul.</p></li>
+        <li class="step reveal" style="--i:2"><span class="num" aria-hidden="true">03</span><h3>Bangun & uji</h3><p>Prototipe yang bisa diklik, lalu dicoba langsung oleh orang sungguhan.</p></li>
+        <li class="step reveal" style="--i:3"><span class="num" aria-hidden="true">04</span><h3>Rilis & rawat</h3><p>Serah terima rapi, dokumentasi jelas, dan tetap gampang dihubungi.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== PLAYGROUND ===== -->
+  <section class="section" id="main" aria-labelledby="main-title">
+    <div class="wrap">
+      <div class="play-head">
+        <div class="reveal">
+          <p class="eyebrow"><b>04</b> Main-main</p>
+          <h2 class="h2" id="main-title">Hal yang bikin <em>senang</em></h2>
+          <p class="play-hint">Geser stikernya sesukamu. Pakai keyboard? Pilih stiker dengan Tab, lalu gerakkan dengan tombol panah.</p>
+        </div>
+        <button class="btn btn-ghost shuffle reveal" type="button" id="shuffle"><svg class="od-icon" aria-hidden="true"><use href="#i-shuffle"/></svg>Acak lagi</button>
+      </div>
+
+      <div class="playfield" id="playfield" role="group" aria-label="Papan stiker yang bisa digeser">
+        <button class="sticker s-pill"   type="button" style="--r:-6deg">Kopi susu gula aren</button>
+        <button class="sticker s-circle" type="button" style="--r:8deg">Kucing <em>oren</em></button>
+        <button class="sticker s-square" type="button" style="--r:-3deg">Tipografi nyeleneh</button>
+        <button class="sticker s-blob"   type="button" style="--r:5deg">Playlist <em>lo-fi</em></button>
+        <button class="sticker s-ticket" type="button" style="--r:-8deg">Jalan sore</button>
+        <button class="sticker s-circle" type="button" style="--r:-10deg; background: var(--butter)">Sketsa di kertas</button>
+        <button class="sticker s-pill"   type="button" style="--r:4deg; background: var(--salmon)">Mi rebus jam 11 malam</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section contact" id="kontak" aria-labelledby="kontak-title">
+    <div class="wrap">
+      <p class="eyebrow reveal"><b>05</b> Kontak</p>
+      <h2 class="contact-title reveal" id="kontak-title" style="--i:1">Ayo bikin sesuatu yang <em>hangat</em> &amp; seru.</h2>
+      <div class="contact-actions reveal" style="--i:2">
+        <button class="btn btn-primary" type="button" id="copy-email" data-email="halo@namakamu.com">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-copy"/></svg>Salin <span class="email-text">halo@namakamu.com</span>
+        </button>
+        <a class="btn btn-ghost" href="mailto:halo@namakamu.com"><svg class="od-icon" aria-hidden="true"><use href="#i-mail"/></svg>Kirim email</a>
+      </div>
+      <ul class="socials reveal" style="--i:3">
+        <li><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+        <li><a href="https://dribbble.com/" target="_blank" rel="noopener">Dribbble <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+        <li><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+        <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-ne"/></svg></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p>© 2026 Nama Kamu. Dibuat dengan kopi dan rasa penasaran.</p>
+    <button class="to-top" type="button" id="to-top"><svg class="od-icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>Kembali ke atas</button>
+  </div>
+</footer>
+
+<!-- Detail proyek -->
+<dialog class="case" id="case" aria-labelledby="case-title">
+  <div class="art case-art" id="case-art" aria-hidden="true"></div>
+  <div class="case-body">
+    <div class="case-top od-row-top">
+      <div class="od-fill od-field">
+        <p class="case-cat" id="case-cat"></p>
+        <h2 class="case-title" id="case-title"></h2>
+      </div>
+      <button class="case-close od-fixed" type="button" id="case-close" aria-label="Tutup detail proyek"><svg class="od-icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <p class="case-desc" id="case-desc"></p>
+    <dl class="case-meta">
+      <div class="od-field"><dt>Peran saya</dt><dd id="case-role"></dd></div>
+      <div class="od-field"><dt>Alat</dt><dd id="case-tools"></dd></div>
+      <div class="od-field"><dt>Tahun</dt><dd id="case-year"></dd></div>
+    </dl>
+    <p class="case-note">Ini proyek contoh. Ganti dengan masalah yang kamu pecahkan, prosesnya, dan hasil nyatanya.</p>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  /* --- Data proyek (edit di sini) --- */
+  const projects = {
+    kopi:      { title: 'Aplikasi Pesan Kopi', cat: 'UI/UX · Aplikasi mobile', art: 'art-1', role: 'UI/UX designer', tools: 'Figma, Protopie', year: '2026',
+                 desc: 'Contoh studi kasus: alur pesan-ambil untuk kedai kopi kecil, dari menu, kustomisasi minuman, sampai notifikasi pesanan siap.' },
+    roti:      { title: 'Identitas Toko Roti', cat: 'Branding · Logo & kemasan', art: 'art-2', role: 'Brand designer', tools: 'Illustrator, Procreate', year: '2025',
+                 desc: 'Contoh studi kasus: logo, palet warna, dan kemasan untuk toko roti rumahan yang ingin terasa hangat sekaligus modern.' },
+    festival:  { title: 'Situs Festival Musik', cat: 'Web · Desain & pengembangan', art: 'art-3', role: 'Designer & front-end developer', tools: 'Figma, HTML/CSS, JavaScript', year: '2025',
+                 desc: 'Contoh studi kasus: situs satu halaman dengan jadwal panggung, profil penampil, dan animasi yang mengikuti irama.' },
+    kebiasaan: { title: 'Dasbor Kebiasaan', cat: 'UI/UX · Web app', art: 'art-4', role: 'Product designer', tools: 'Figma, Notion', year: '2024',
+                 desc: 'Contoh studi kasus: dasbor sederhana untuk mencatat kebiasaan harian tanpa membuat penggunanya merasa bersalah.' }
+  };
+
+  /* --- Huruf nama yang memantul --- */
+  $$('[data-split]').forEach(el => {
+    el.setAttribute('aria-label', el.textContent.trim().replace(/\s+/g, ' '));
+    let i = 0;
+    $$('.line', el).forEach(line => {
+      const text = line.textContent.trim();
+      line.textContent = '';
+      line.setAttribute('aria-hidden', 'true');
+      for (const c of text) {
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.textContent = c;
+        s.style.setProperty('--i', i++);
+        line.append(s);
+      }
+    });
+  });
+
+  /* --- Peran yang bergantian --- */
+  const roles = $$('.role-word');
+  if (roles.length > 1 && !reduce) {
+    let r = 0;
+    setInterval(() => {
+      const prev = roles[r];
+      prev.classList.remove('is-on'); prev.classList.add('is-out');
+      setTimeout(() => prev.classList.remove('is-out'), 400);
+      r = (r + 1) % roles.length;
+      roles[r].classList.add('is-on');
+    }, 2400);
+  }
+
+  /* --- Grid dasbor (art 4) --- */
+  const grid = $(".work .art-4 .grid");
+  const track = $(".marquee-track");
+  if (track) track.append(track.firstElementChild.cloneNode(true));
+  if (grid) {
+    const pattern = 'onxhxonpxonhxxonxpohnxoxhonxpnoxh';
+    for (const k of pattern.slice(0, 28)) {
+      const i = document.createElement('i');
+      if (k === 'o') i.className = 'on'; else if (k === 'h') i.className = 'hot'; else if (k === 'p') i.className = 'pink';
+      grid.append(i);
+    }
+  }
+
+  /* --- Muncul saat di-scroll --- */
+  const reveals = $$('.reveal');
+  if ('IntersectionObserver' in window && !reduce) {
+    const io = new IntersectionObserver(entries => entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+    }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => io.observe(el));
+  } else {
+    reveals.forEach(el => el.classList.add('is-in'));
+  }
+
+  /* --- Navigasi: menu mobile + penanda bagian aktif --- */
+  const header = $('.site-header');
+  const menuBtn = $('.menu-btn');
+  const setMenu = open => {
+    header.toggleAttribute('data-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+  };
+  menuBtn.addEventListener('click', () => setMenu(!header.hasAttribute('data-open')));
+  $$('.nav-links a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && header.hasAttribute('data-open')) { setMenu(false); menuBtn.focus(); }
+  });
+
+  const navLinks = $$('.nav-links a');
+  if ('IntersectionObserver' in window) {
+    const navIO = new IntersectionObserver(entries => entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      navLinks.forEach(a => a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + e.target.id)));
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    navLinks.forEach(a => { const s = $(a.getAttribute('href')); if (s) navIO.observe(s); });
+  }
+
+  /* --- Progress bar --- */
+  const bar = $('.progress');
+  let ticking = false;
+  const onScroll = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    ticking = false;
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+
+  /* --- Kursor pengikut (hanya mouse) --- */
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce) {
+    const c = $('.cursor');
+    let x = -100, y = -100, cx = -100, cy = -100;
+    addEventListener('pointermove', e => {
+      x = e.clientX; y = e.clientY;
+      c.classList.add('is-on');
+      c.classList.toggle('is-big', !!e.target.closest('a, button, .ch'));
+    });
+    document.addEventListener('pointerleave', () => c.classList.remove('is-on'));
+    (function loop() {
+      cx += (x - cx) * 0.2; cy += (y - cy) * 0.2;
+      c.style.transform = `translate(${cx}px, ${cy}px)`;
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* --- Filter karya --- */
+  const filters = $$('.filter');
+  const cards = $$('.work');
+  const worksEl = $('#works');
+  const countEl = $('#works-count');
+  filters.forEach(btn => btn.addEventListener('click', () => {
+    const f = btn.dataset.filter;
+    filters.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    let n = 0;
+    cards.forEach(card => {
+      const show = f === 'semua' || card.dataset.cat === f;
+      card.hidden = !show;
+      if (show) {
+        card.classList.add('is-in');
+        card.style.setProperty('--i', n++);
+        card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop');
+      }
+    });
+    worksEl.classList.toggle('is-filtered', f !== 'semua');
+    countEl.textContent = `${n} proyek`;
+  }));
+
+  /* --- Dialog detail proyek --- */
+  const dlg = $('#case');
+  let lastTrigger = null;
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.work-open');
+    if (!btn) return;
+    const p = projects[btn.dataset.id];
+    if (!p) return;
+    lastTrigger = btn;
+    $('#case-title').textContent = p.title;
+    $('#case-cat').textContent = p.cat;
+    $('#case-desc').textContent = p.desc;
+    $('#case-role').textContent = p.role;
+    $('#case-tools').textContent = p.tools;
+    $('#case-year').textContent = p.year;
+    const art = $('#case-art');
+    const source = btn.closest('.work').querySelector('.art');
+    art.className = `art case-art ${p.art}`;
+    art.innerHTML = source ? source.innerHTML : '';
+    dlg.showModal();
+    requestAnimationFrame(() => $('#case-close').focus());
+  });
+  $('#case-close').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => {
+    const target = lastTrigger && lastTrigger.isConnected && !lastTrigger.closest('[hidden]') ? lastTrigger : $('.filter[aria-pressed="true"]');
+    if (target) target.focus();
+  });
+
+  /* --- Toast --- */
+  const toastEl = $('#toast');
+  let toastTimer;
+  const toast = msg => {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.hidden = false;
+    requestAnimationFrame(() => toastEl.classList.add('show'));
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('show');
+      toastTimer = setTimeout(() => { toastEl.hidden = true; }, 220);
+    }, 2600);
+  };
+
+  /* --- Salin email --- */
+  const copyBtn = $('#copy-email');
+  copyBtn.addEventListener('click', async () => {
+    const email = copyBtn.dataset.email;
+    try {
+      await navigator.clipboard.writeText(email);
+      toast('Email tersalin! Sampai jumpa di inbox.');
+    } catch {
+      toast(`Gagal menyalin otomatis. Email saya: ${email}`);
+    }
+  });
+
+  /* --- Kembali ke atas --- */
+  $('#to-top').addEventListener('click', () => {
+    scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    $('.logo').focus({ preventScroll: true });
+  });
+
+  /* --- Papan stiker --- */
+  const field = $('#playfield');
+  const stickers = $$('.sticker', field);
+  const pos = new Map();
+  let z = 10;
+  const place = (s, x, y) => {
+    const maxX = Math.max(0, field.clientWidth - s.offsetWidth);
+    const maxY = Math.max(0, field.clientHeight - s.offsetHeight);
+    x = Math.min(maxX, Math.max(0, x));
+    y = Math.min(maxY, Math.max(0, y));
+    pos.set(s, { x, y });
+    s.style.setProperty('--x', x + 'px');
+    s.style.setProperty('--y', y + 'px');
+  };
+  const scatter = (animate) => {
+    const cols = field.clientWidth >= 900 ? 4 : field.clientWidth >= 560 ? 3 : 2;
+    const rows = Math.ceil(stickers.length / cols);
+    const cw = field.clientWidth / cols, ch = field.clientHeight / rows;
+    const order = stickers.map((s, i) => i).sort(() => Math.random() - 0.5);
+    if (animate && !reduce) {
+      field.classList.add('is-shuffling');
+      setTimeout(() => field.classList.remove('is-shuffling'), 420);
+    }
+    stickers.forEach((s, i) => {
+      const slot = order[i];
+      const cx = (slot % cols) * cw + cw / 2, cy = Math.floor(slot / cols) * ch + ch / 2;
+      const jx = (Math.random() - 0.5) * cw * 0.3, jy = (Math.random() - 0.5) * ch * 0.3;
+      place(s, cx - s.offsetWidth / 2 + jx, cy - s.offsetHeight / 2 + jy);
+      s.style.setProperty('--r', `${Math.round((Math.random() - 0.5) * 20)}deg`);
+    });
+  };
+  const lift = s => s.style.setProperty('--z', ++z);
+
+  stickers.forEach(s => {
+    let dx = 0, dy = 0, dragging = false;
+    s.addEventListener('pointerdown', e => {
+      dragging = true;
+      s.setPointerCapture(e.pointerId);
+      const p = pos.get(s) || { x: 0, y: 0 };
+      const rect = field.getBoundingClientRect();
+      dx = e.clientX - rect.left - p.x;
+      dy = e.clientY - rect.top - p.y;
+      s.classList.add('is-drag');
+      lift(s);
+    });
+    s.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const rect = field.getBoundingClientRect();
+      place(s, e.clientX - rect.left - dx, e.clientY - rect.top - dy);
+    });
+    const end = () => { dragging = false; s.classList.remove('is-drag'); };
+    s.addEventListener('pointerup', end);
+    s.addEventListener('pointercancel', end);
+    s.addEventListener('keydown', e => {
+      const step = e.shiftKey ? 48 : 16;
+      const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+      if (!d) return;
+      e.preventDefault();
+      const p = pos.get(s) || { x: 0, y: 0 };
+      lift(s);
+      place(s, p.x + d[0], p.y + d[1]);
+    });
+    s.setAttribute('aria-label', `Stiker ${s.textContent.trim()}. Geser dengan mouse, jari, atau tombol panah.`);
+  });
+
+  $('#shuffle').addEventListener('click', () => scatter(true));
+  scatter(false);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => scatter(false));
+  let rt;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => stickers.forEach(s => { const p = pos.get(s); if (p) place(s, p.x, p.y); }), 120);
+  });
+})();
+</script>
+</body>
+</html>
