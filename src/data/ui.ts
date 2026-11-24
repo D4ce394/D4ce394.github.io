@@ -13,7 +13,8 @@ export const ui = {
     work: { eyebrow: 'Work', title: 'Selected <em>projects</em>', filterLabel: 'Filter projects by category', count: (n: number) => `${n} projects, newest first`, featured: 'Featured', details: (name: string) => `See details for ${name}` },
     filters: { all: 'All', backend: 'Backend', fullstack: 'Full-stack', ai: 'AI' },
     about: { eyebrow: 'About', srTitle: 'About me', big: (nick: string) => `Hi! I'm <em>${nick}</em>, a backend developer who turns messy requirements into APIs that make sense.`, photo: (name: string) => `Photo of ${name}`, facts: [['Based in', 'Bandung, Indonesia'], ['Studying', 'Informatics, GPA 3.72'], ['Open to', 'Backend, full-stack, data, AI']] },
-    experience: { eyebrow: 'Experience', title: "Where I've <em>worked</em>", eduNote: 'GPA 3.72/4.00. Graduating 2027.' },
+    experience: { eyebrow: 'Experience', title: "Where I've <em>worked</em>" },
+    education: { eyebrow: 'Education', title: "Where I <em>study</em>" },
     research: { eyebrow: 'Research', title: 'Accepted <em>paper</em>' },
     certifications: { eyebrow: 'Certifications', title: 'Courses &amp; <em>credentials</em>' },
     toolbox: { eyebrow: 'Toolbox', title: 'What I <em>use</em>' },
@@ -21,7 +22,7 @@ export const ui = {
     contact: { eyebrow: 'Contact', title: "Let's build something <em>solid</em> &amp; fun.", copy: 'Copy', send: 'Send an email' },
     footer: 'Made in Bandung.', toTop: 'Back to top',
     dialog: { close: 'Close project details', part: 'My part', stack: 'Stack', when: 'When', repo: 'View repository', private: 'Private client project, so the code is not public.' },
-    gallery: { eyebrow: 'Gallery', title: 'Activity <em>gallery</em>', hint: 'Moments from events, teams and campus life. Tap a photo to enlarge it.', captions: ['RPL division showcase, Kopasus IT', 'Group photo at the Faculty of Informatics building', 'Team photo', 'Hello World team photoshoot', 'Team in Telkom University jackets', 'Team at the myU sign'], open: 'Open photo', close: 'Close photo' },
+    gallery: { eyebrow: 'Gallery', title: 'Activity <em>gallery</em>', hint: 'Moments from events, teams and campus life. Tap a photo to enlarge it.', captions: ['RPL division showcase, Kopasus IT', 'PKKMB Telkom University', 'BPM Aksi Commission', 'Hello World Team', 'Cupeat Team', 'Fortran Team'], open: 'Open photo', close: 'Close photo' },
   },
   id: {
     skip: 'Langsung ke karya',
@@ -36,7 +37,8 @@ export const ui = {
     work: { eyebrow: 'Karya', title: 'Proyek <em>pilihan</em>', filterLabel: 'Saring proyek berdasarkan kategori', count: (n: number) => `${n} proyek, terbaru di atas`, featured: 'Unggulan', details: (name: string) => `Lihat detail ${name}` },
     filters: { all: 'Semua', backend: 'Backend', fullstack: 'Full-stack', ai: 'AI' },
     about: { eyebrow: 'Tentang', srTitle: 'Tentang saya', big: (nick: string) => `Halo! Saya <em>${nick}</em>, backend developer yang mengubah kebutuhan yang berantakan jadi API yang masuk akal.`, photo: (name: string) => `Foto ${name}`, facts: [['Domisili', 'Bandung, Indonesia'], ['Kuliah', 'Informatika, IPK 3,72'], ['Terbuka untuk', 'Backend, full-stack, data, AI']] },
-    experience: { eyebrow: 'Pengalaman', title: 'Tempat saya <em>bekerja</em>', eduNote: 'IPK 3,72/4,00. Lulus 2027.' },
+    experience: { eyebrow: 'Pengalaman', title: 'Tempat saya <em>bekerja</em>' },
+    education: { eyebrow: 'Pendidikan', title: 'Tempat saya <em>kuliah</em>' },
     research: { eyebrow: 'Riset', title: 'Paper yang <em>diterima</em>' },
     certifications: { eyebrow: 'Sertifikasi', title: 'Kursus &amp; <em>kredensial</em>' },
     toolbox: { eyebrow: 'Toolbox', title: 'Yang saya <em>pakai</em>' },
@@ -44,7 +46,7 @@ export const ui = {
     contact: { eyebrow: 'Kontak', title: 'Ayo bikin sesuatu yang <em>solid</em> &amp; seru.', copy: 'Salin', send: 'Kirim email' },
     footer: 'Dibuat di Bandung.', toTop: 'Kembali ke atas',
     dialog: { close: 'Tutup detail proyek', part: 'Peran saya', stack: 'Stack', when: 'Waktu', repo: 'Lihat repository', private: 'Proyek klien privat, jadi kodenya tidak publik.' },
-    gallery: { eyebrow: 'Galeri', title: 'Galeri <em>kegiatan</em>', hint: 'Momen dari acara, tim, dan kegiatan kampus. Ketuk foto untuk memperbesar.', captions: ['Pameran divisi RPL, Kopasus IT', 'Foto angkatan di Gedung Fakultas Informatika', 'Foto tim', 'Sesi foto tim Hello World', 'Tim beralmamater Telkom University', 'Tim di depan tulisan myU'], open: 'Buka foto', close: 'Tutup foto' },
+    gallery: { eyebrow: 'Galeri', title: 'Galeri <em>kegiatan</em>', hint: 'Momen dari acara, tim, dan kegiatan kampus. Ketuk foto untuk memperbesar.', captions: ['Pameran divisi RPL, Kopasus IT', 'PKKMB Telkom University', 'BPM Aksi Commission', 'Hello World Team', 'Cupeat Team', 'Fortran Team'], open: 'Buka foto', close: 'Tutup foto' },
   },
 };
 

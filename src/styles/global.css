@@ -436,8 +436,7 @@ section { scroll-margin-top: 72px; }
 /* ===== Process (tomato block) ===== */
 .process { background: var(--tint); }
 .steps { display: grid; gap: var(--s-4); margin-top: var(--s-6); }
-@media (min-width: 768px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1200px) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 768px) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .step {
   border-top: 1px solid rgba(199, 57, 26, .3); padding-top: var(--s-3);
   display: grid; gap: var(--s-2); align-content: start;
@@ -487,6 +486,7 @@ section { scroll-margin-top: 72px; }
 }
 .contact-title em { color: var(--tomato); -webkit-text-stroke: 0; }
 .contact-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-5); }
+@media (max-width: 479px) { .contact-actions .btn { padding-inline: var(--s-2); gap: 8px; font-size: 16px; } .contact-actions .btn .od-icon { display: none; } }
 .contact .btn-primary { background: var(--espresso); color: var(--butter); }
 .contact .btn-ghost { border-color: var(--espresso); color: var(--espresso); }
 @media (hover: hover) {

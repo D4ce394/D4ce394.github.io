@@ -38,10 +38,6 @@ const gallery = await Promise.all(t.gallery.captions.map(async (caption, i) => {
   const full = await getImage({ src, width: Math.min(1600, src.width), format: 'webp' });
   return { thumb: thumb.src, full: full.src, w: thumb.attributes.width, h: thumb.attributes.height, caption };
 }));
-const steps = [
-  ...p.experience.map((m) => ({ when: m.date, title: m.role, org: m.org, text: m.desc })),
-  { when: p.education.period, title: p.education.degree, org: p.education.school, text: t.experience.eduNote },
-];
 ---
 <Base lang={lang} alt={other}>
 <a class="skip" href="#work">{t.skip}</a>
@@ -218,24 +214,37 @@ const steps = [
         <h2 class="h2" id="experience-title" set:html={t.experience.title} />
       </div>
       <ol class="steps">
-        {steps.map((s, i) => (
+        {p.experience.map((m, i) => (
           <li class="step reveal" style={`--i:${i}`}>
             <span class="num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-            <p class="when">{s.when}</p>
-            <h3>{s.title}</h3>
-            <p class="org">{s.org}</p>
-            <p>{s.text}</p>
+            <p class="when">{m.date}</p>
+            <h3>{m.role}</h3>
+            <p class="org">{m.org}</p>
+            <p>{m.desc}</p>
           </li>
         ))}
       </ol>
     </div>
   </section>
 
-  <!-- 05 Research -->
-  <section class="section" id="research" aria-labelledby="research-title">
+  <!-- 05 Education -->
+  <section class="section" id="education" aria-labelledby="education-title">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow"><b>05</b> {t.research.eyebrow}</p>
+        <p class="eyebrow"><b>05</b> {t.education.eyebrow}</p>
+        <h2 class="h2" id="education-title" set:html={t.education.title} />
+      </div>
+      <ul class="certs reveal">
+        <li><b>{p.education.degree}</b><span>{p.education.school} · {p.education.period} · {p.education.gpa}</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 06 Research -->
+  <section class="section process" id="research" aria-labelledby="research-title">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow"><b>06</b> {t.research.eyebrow}</p>
         <h2 class="h2" id="research-title" set:html={t.research.title} />
       </div>
       <div class="research-grid">
@@ -251,11 +260,11 @@ const steps = [
     </div>
   </section>
 
-  <!-- 06 Certifications -->
-  <section class="section process" id="certifications" aria-labelledby="certifications-title">
+  <!-- 07 Certifications -->
+  <section class="section" id="certifications" aria-labelledby="certifications-title">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow"><b>06</b> {t.certifications.eyebrow}</p>
+        <p class="eyebrow"><b>07</b> {t.certifications.eyebrow}</p>
         <h2 class="h2" id="certifications-title" set:html={t.certifications.title} />
       </div>
       <ul class="certs reveal">
@@ -264,11 +273,11 @@ const steps = [
     </div>
   </section>
 
-  <!-- 07 Toolbox -->
-  <section class="section" id="toolbox" aria-labelledby="toolbox-title">
+  <!-- 08 Toolbox -->
+  <section class="section process" id="toolbox" aria-labelledby="toolbox-title">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow"><b>07</b> {t.toolbox.eyebrow}</p>
+        <p class="eyebrow"><b>08</b> {t.toolbox.eyebrow}</p>
         <h2 class="h2" id="toolbox-title" set:html={t.toolbox.title} />
       </div>
       <div class="toolbox">
@@ -282,12 +291,12 @@ const steps = [
     </div>
   </section>
 
-  <!-- 08 Off duty -->
+  <!-- 09 Off duty -->
   <section class="section" id="fun" aria-labelledby="fun-title">
     <div class="wrap">
       <div class="play-head">
         <div class="reveal">
-          <p class="eyebrow"><b>08</b> {t.fun.eyebrow}</p>
+          <p class="eyebrow"><b>09</b> {t.fun.eyebrow}</p>
           <h2 class="h2" id="fun-title" set:html={t.fun.title} />
           <p class="play-hint">{t.fun.hint}</p>
         </div>
@@ -303,10 +312,10 @@ const steps = [
     </div>
   </section>
 
-  <!-- 09 Contact -->
+  <!-- 10 Contact -->
   <section class="section contact" id="contact" aria-labelledby="contact-title">
     <div class="wrap">
-      <p class="eyebrow reveal"><b>09</b> {t.contact.eyebrow}</p>
+      <p class="eyebrow reveal"><b>10</b> {t.contact.eyebrow}</p>
       <h2 class="contact-title reveal" id="contact-title" style="--i:1" set:html={t.contact.title} />
       <div class="contact-actions reveal" style="--i:2">
         <button class="btn btn-primary" type="button" id="copy-email" data-email={p.email}>
